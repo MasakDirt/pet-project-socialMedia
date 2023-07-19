@@ -2,7 +2,6 @@ package com.social.media.model;
 
 import com.social.media.model.entity.User;
 import jakarta.validation.ConstraintViolation;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -94,7 +93,7 @@ public class UserTests {
     }
 
     @ParameterizedTest
-    @MethodSource("provideInvalidPassword")
+    @MethodSource("provideInvalidPasswordAndUsername")
     public void test_Invalid_User_Password(String password, String error){
         User invalid = new User();
         invalid.setEmail(validUser.getEmail());
@@ -110,15 +109,8 @@ public class UserTests {
         assertEquals(error, violations.iterator().next().getInvalidValue());
     }
 
-    private static Stream<Arguments> provideInvalidPassword(){
-        return Stream.of(
-                Arguments.of("",""),
-                Arguments.of(null,null)
-        );
-    }
-
     @ParameterizedTest
-    @MethodSource("provideInvalidPassword")
+    @MethodSource("provideInvalidPasswordAndUsername")
     public void test_Invalid_User_Username(String username, String error){
         User invalid = new User();
         invalid.setEmail(validUser.getEmail());
@@ -134,7 +126,7 @@ public class UserTests {
         assertEquals(error, violations.iterator().next().getInvalidValue());
     }
 
-    private static Stream<Arguments> provideInvalidUsername(){
+    private static Stream<Arguments> provideInvalidPasswordAndUsername(){
         return Stream.of(
                 Arguments.of("",""),
                 Arguments.of(null,null)
