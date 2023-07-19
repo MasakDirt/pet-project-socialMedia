@@ -60,6 +60,18 @@ public class User {
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Comment> myComments;
 
+    @JsonManagedReference
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Like> myLikes;
+
+    @JsonManagedReference
+    @OneToOne(mappedBy = "owner", cascade = CascadeType.ALL)
+    private Messenger myMessengers;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL)
+    private List<Messenger> messagesToMe;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -85,7 +97,7 @@ public class User {
                 '}';
     }
 
-    public String getName(){
+    public String getName() {
         return firstName + " " + lastName;
     }
 }
