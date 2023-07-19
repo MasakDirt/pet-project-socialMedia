@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,19 +27,19 @@ public class User {
     @Column(unique = true, nullable = false)
     private String username;
 
+    @NotNull
     @Column(nullable = false)
-    @NotBlank(message = "The 'first name' cannot be empty")
     @Pattern(regexp = NAME_REGEXP,
             message = "First name must start with a capital letter and followed by one or more lowercase")
     private String firstName;
 
+    @NotNull
     @Column(nullable = false)
-    @NotBlank(message = "The 'last name' cannot be empty")
     @Pattern(regexp = NAME_REGEXP,
             message = "Last name must start with a capital letter and followed by one or more lowercase")
     private String lastName;
 
-    @NotBlank(message = "The 'email' cannot be empty")
+    @NotNull
     @Pattern(regexp = "[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}", message = "Must be a valid e-mail address")
     @Column(name = "email", nullable = false, unique = true)
     private String email;

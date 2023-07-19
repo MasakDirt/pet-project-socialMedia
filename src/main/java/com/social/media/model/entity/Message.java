@@ -21,7 +21,7 @@ public class Message {
     private long id;
 
     @NotBlank
-    @Column(nullable = false, length = 500)
+    @Column(nullable = false)
     private String message;
 
     @NotNull
@@ -29,7 +29,7 @@ public class Message {
     private LocalDateTime timestamp;
 
     @JsonBackReference
-    @Column(name = "messenger_id")
+    @JoinColumn(name = "messenger_id")
     @ManyToOne(fetch = FetchType.EAGER)
     private Messenger messenger;
 
