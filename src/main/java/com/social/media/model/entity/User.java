@@ -1,13 +1,14 @@
 package com.social.media.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -50,6 +51,14 @@ public class User {
     @JsonBackReference
     @JoinColumn(name = "role_id")
     private Role role;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Post> myPosts;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Comment> myComments;
 
     @Override
     public boolean equals(Object o) {
