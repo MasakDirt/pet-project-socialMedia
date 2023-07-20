@@ -24,7 +24,7 @@ public class User {
     private long id;
 
     @NotNull
-    @Pattern(regexp = "^[a-z0-9-_.]+$")
+    @Pattern(regexp = "^[a-z0-9-.]+$")
     @Column(unique = true, nullable = false)
     private String username;
 
