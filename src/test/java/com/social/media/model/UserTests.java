@@ -26,7 +26,7 @@ public class UserTests {
         validUser.setFirstName("User");
         validUser.setLastName("Userslast");
         validUser.setPassword("validPass");
-        validUser.setUsername("@users");
+        validUser.setUsername("users");
     }
 
     @Test
@@ -93,7 +93,7 @@ public class UserTests {
     }
 
     @ParameterizedTest
-    @MethodSource("provideInvalidPasswordAndUsername")
+    @MethodSource("provideInvalidPassword")
     public void test_Invalid_User_Password(String password, String error){
         User invalid = new User();
         invalid.setEmail(validUser.getEmail());
@@ -109,8 +109,15 @@ public class UserTests {
         assertEquals(error, violations.iterator().next().getInvalidValue());
     }
 
+    private static Stream<Arguments> provideInvalidPassword(){
+        return Stream.of(
+                Arguments.of("",""),
+                Arguments.of(null,null)
+        );
+    }
+
     @ParameterizedTest
-    @MethodSource("provideInvalidPasswordAndUsername")
+    @MethodSource("provideInvalidUsername")
     public void test_Invalid_User_Username(String username, String error){
         User invalid = new User();
         invalid.setEmail(validUser.getEmail());
@@ -126,9 +133,14 @@ public class UserTests {
         assertEquals(error, violations.iterator().next().getInvalidValue());
     }
 
-    private static Stream<Arguments> provideInvalidPasswordAndUsername(){
+    private static Stream<Arguments> provideInvalidUsername(){
         return Stream.of(
                 Arguments.of("",""),
+                Arguments.of("Invalid","Invalid"),
+                Arguments.of("inValid","inValid"),
+                Arguments.of("invalid♡♡♡","invalid♡♡♡"),
+                Arguments.of("invalid@","invalid@"),
+                Arguments.of("invalid$","invalid$"),
                 Arguments.of(null,null)
         );
     }
