@@ -38,6 +38,10 @@ public class Comment {
     @ManyToOne(fetch = FetchType.EAGER)
     private Post post;
 
+    public Comment(){
+        this.timestamp = LocalDateTime.now();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
