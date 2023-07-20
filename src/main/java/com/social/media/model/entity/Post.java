@@ -30,6 +30,9 @@ public class Post {
     @NotNull
     private File photo;
 
+    @NotNull
+    private String description;
+
     @JsonBackReference
     @JoinColumn(name = "owner_id")
     @ManyToOne(fetch = FetchType.EAGER)
@@ -43,6 +46,9 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Like> likes;
 
+    public Post() {
+        this.timestamp = LocalDateTime.now();
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
