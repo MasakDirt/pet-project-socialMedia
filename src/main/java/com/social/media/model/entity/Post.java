@@ -49,6 +49,7 @@ public class Post {
     public Post() {
         this.timestamp = LocalDateTime.now();
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -23,7 +23,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotBlank(message = "The 'username' cannot be empty")
+    @NotNull
+    @Pattern(regexp = "^[a-z0-9-_.]+$")
     @Column(unique = true, nullable = false)
     private String username;
 
