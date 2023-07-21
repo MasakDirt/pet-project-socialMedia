@@ -25,6 +25,8 @@ public class SocialMediaApplication implements CommandLineRunner {
     private final RoleService roleService;
     private final CommentService commentService;
     private final LikeService likeService;
+    private final MessengerService messengerService;
+    private final MessageService messageService;
 
     private static void writeInPropertiesFile() {
         String username = System.getenv("username");
@@ -97,7 +99,6 @@ public class SocialMediaApplication implements CommandLineRunner {
         createComment(adminId, post2Id, "I like cats!");
 
         createComment(garryId, post3Id, "I have no comments");
-        createComment(oliviaId, post3Id, "Are you crazy!?");
 
         createComment(garryId, post4Id, "Woooow, it`s amazing!!");
         createComment(oliviaId, post4Id, "Are you crazy!?");
@@ -121,6 +122,27 @@ public class SocialMediaApplication implements CommandLineRunner {
         createLike(adminId, post5Id);
         createLike(garryId, post5Id);
         createLike(oliviaId, post5Id);
+
+//      MESSENGERS
+        long adminWithGarryMessengerId = createMessenger(adminId, garryId);
+        long garryWithOliviaMessengerId = createMessenger(garryId, oliviaId);
+        long oliviaWithAdminMessengerId = createMessenger(oliviaId, adminId);
+
+        long garryWithAdminMessengerId = messengerService.readByOwnerAndRecipient(garryId, adminId).getId();
+        long oliviaWithGarryMessengerId = messengerService.readByOwnerAndRecipient(oliviaId, garryId).getId();
+        long adminWithOliviaMessengerId = messengerService.readByOwnerAndRecipient(adminId, oliviaId).getId();
+
+//      MESSAGES
+        createMessage(adminWithGarryMessengerId, "Hi, how are you?");
+        createMessage(garryWithAdminMessengerId, "Hi, I`m fine and you?");
+        createMessage(adminWithGarryMessengerId, "Nice, thanks.");
+
+        createMessage(garryWithOliviaMessengerId, "Wow, I like that new Social Media, and you?");
+        createMessage(oliviaWithGarryMessengerId, "I like it, too)))");
+
+        createMessage(oliviaWithAdminMessengerId, "Today, I will go to the hospital, can you lift me?");
+        createMessage(adminWithOliviaMessengerId, "Of course, tell me what time please.");
+        createMessage(oliviaWithAdminMessengerId, "At 15.00");
     }
 
     private Role createRole(String name) {
@@ -165,4 +187,16 @@ public class SocialMediaApplication implements CommandLineRunner {
         var created = likeService.create(ownerId, postId);
         log.info("{} post has been successfully liked by {}", created.getPost().getOwner().getName(), created.getOwner().getName());
     }
+
+    private long createMessenger(long ownerId, long recipientId) {
+        var created = messengerService.create(ownerId, recipientId);
+        log.info("Messenger between {} and {} has been created.", created.getOwner().getName(), created.getRecipient().getName());
+        return created.getId();
+    }
+
+    private void createMessage(long messengerId, String message) {
+        var created = messageService.create(messengerId, message);
+        log.info("Message for {} has been created", created.getMessenger());
+    }
 }
+
