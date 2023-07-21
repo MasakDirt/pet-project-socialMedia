@@ -20,7 +20,7 @@ public class Messenger {
 
     @JsonBackReference
     @JoinColumn(name = "owner_id")
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     private User owner;
 
     @JsonBackReference
