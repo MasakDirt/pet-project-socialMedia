@@ -33,6 +33,10 @@ public class Message {
     @ManyToOne(fetch = FetchType.EAGER)
     private Messenger messenger;
 
+    public Message() {
+        this.timestamp = LocalDateTime.now();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -1,4 +1,4 @@
-package com.social.media.model.exception;
+package com.social.media.exception;
 
 public class PhotoInBucketNotFound extends RuntimeException{
     public PhotoInBucketNotFound() {

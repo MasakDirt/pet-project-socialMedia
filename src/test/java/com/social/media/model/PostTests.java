@@ -24,6 +24,7 @@ public class PostTests {
         validPost.setPhoto(new File("photos/nature-photography.webp"));
         validPost.setTimestamp(LocalDateTime.now());
         validPost.setOwner(new User());
+        validPost.setDescription("Description");
     }
 
     @Test
@@ -38,6 +39,7 @@ public class PostTests {
         Post invalid = new Post();
         invalid.setPhoto(null);
         invalid.setTimestamp(LocalDateTime.now());
+        invalid.setDescription("");
 
         Set<ConstraintViolation<Post>> violations = getViolations(invalid);
         Assertions.assertEquals(1, violations.size());
@@ -47,7 +49,19 @@ public class PostTests {
     public void test_Invalid_Timestamp() {
         Post invalid = new Post();
         invalid.setPhoto(new File("photos/nature-photography.webp"));
+        invalid.setDescription("");
         invalid.setTimestamp(null);
+
+        Set<ConstraintViolation<Post>> violations = getViolations(invalid);
+        Assertions.assertEquals(1, violations.size());
+    }
+
+    @Test
+    public void test_Invalid_Description() {
+        Post invalid = new Post();
+        invalid.setPhoto(new File("photos/nature-photography.webp"));
+        invalid.setDescription(null);
+        invalid.setTimestamp(LocalDateTime.now());
 
         Set<ConstraintViolation<Post>> violations = getViolations(invalid);
         Assertions.assertEquals(1, violations.size());

@@ -59,6 +59,7 @@ public class CommentTests {
         invalid.setComment("comment");
         invalid.setOwner(new User());
         invalid.setPost(new Post());
+        invalid.setTimestamp(null);
 
         Set<ConstraintViolation<Comment>> violations = getViolations(invalid);
 
