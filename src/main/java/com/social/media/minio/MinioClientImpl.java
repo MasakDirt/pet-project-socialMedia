@@ -1,4 +1,4 @@
-package com.social.media.model.entity;
+package com.social.media.minio;
 
 import io.minio.*;
 import io.minio.errors.*;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class MinioClientHelper {
+public class MinioClientImpl {
     private static final MinioClient minioClient = getMinioClient();
 
     public void makeBucketWithUsername(String username) throws ServerException,
@@ -71,7 +71,7 @@ public class MinioClientHelper {
     }
 
     private static MinioClient getMinioClient() {
-        return MinioClient.builder()
+        return io.minio.MinioClient.builder()
                 .endpoint("https://play.min.io")
                 .credentials("Q3AM3UQ867SPQQA43P2F", "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG")
                 .build();
