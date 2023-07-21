@@ -5,7 +5,6 @@ import com.social.media.model.entity.Post;
 import com.social.media.model.entity.User;
 import com.social.media.service.UserService;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
