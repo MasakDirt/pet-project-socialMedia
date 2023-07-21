@@ -1,6 +1,6 @@
 package com.social.media.service;
 
-import com.social.media.model.entity.MinioClientHelper;
+import com.social.media.minio.MinioClientImpl;
 import com.social.media.model.entity.Post;
 import com.social.media.repository.PostRepository;
 import io.minio.errors.*;
@@ -55,7 +55,7 @@ public class PostService {
     private void makeBucketAndPutPhotoToMinIO(String username, String file) throws ServerException, InsufficientDataException, ErrorResponseException,
             IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
 
-        MinioClientHelper minioClient = new MinioClientHelper();
+        MinioClientImpl minioClient = new MinioClientImpl();
         if (!minioClient.isBucketExist(username)) {
             minioClient.makeBucketWithUsername(username);
         }

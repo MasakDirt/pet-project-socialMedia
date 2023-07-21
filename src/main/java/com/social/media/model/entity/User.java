@@ -56,6 +56,10 @@ public class User {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    private List<Messenger> myMessengers;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Post> myPosts;
 
     @JsonManagedReference
@@ -65,10 +69,6 @@ public class User {
     @JsonManagedReference
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     private List<Like> myLikes;
-
-    @JsonManagedReference
-    @OneToOne(mappedBy = "owner", cascade = CascadeType.ALL)
-    private Messenger myMessengers;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL)
