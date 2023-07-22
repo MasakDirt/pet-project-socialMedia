@@ -5,7 +5,6 @@ import com.social.media.model.entity.Comment;
 import com.social.media.model.entity.Post;
 import com.social.media.model.entity.User;
 import jakarta.persistence.EntityNotFoundException;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
