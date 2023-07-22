@@ -40,7 +40,7 @@ public class PostService {
 
     public Post readById(long id) {
         return postRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Post with id" + id + "not found!"));
+                new EntityNotFoundException("Post with id " + id + " not found!"));
     }
 
     public Post update(@NotNull Post updatedPost) {
