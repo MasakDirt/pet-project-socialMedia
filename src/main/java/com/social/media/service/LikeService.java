@@ -9,6 +9,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Service
 @AllArgsConstructor
 public class LikeService {
@@ -43,5 +46,9 @@ public class LikeService {
     public boolean isExistLike(@NotNull User owner, @NotNull Post post) {
         Like like = readByOwnerAndPost(owner, post);
         return like != null;
+    }
+
+    public Set<Like> getAll() {
+        return new HashSet<>(likeRepository.findAll());
     }
 }
