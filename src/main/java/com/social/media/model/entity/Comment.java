@@ -48,7 +48,7 @@ public class Comment {
         if (o == null || getClass() != o.getClass()) return false;
         Comment commentObj = (Comment) o;
         return id == commentObj.id && Objects.equals(comment, commentObj.comment) &&
-                Objects.equals(timestamp.toLocalTime(), commentObj.timestamp.toLocalTime()) && Objects.equals(owner, commentObj.owner);
+                Objects.equals(timestamp.toLocalDate(), commentObj.timestamp.toLocalDate()) && Objects.equals(owner, commentObj.owner);
     }
 
     @Override
