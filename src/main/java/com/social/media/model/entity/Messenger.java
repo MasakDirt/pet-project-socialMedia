@@ -6,8 +6,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -30,7 +30,7 @@ public class Messenger {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "messenger", cascade = CascadeType.ALL)
-    private List<Message> messages;
+    private Set<Message> messages;
 
     @Override
     public boolean equals(Object o) {

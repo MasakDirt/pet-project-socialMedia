@@ -9,8 +9,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -56,23 +56,23 @@ public class User {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private List<Messenger> myMessengers;
+    private Set<Messenger> myMessengers;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private List<Post> myPosts;
+    private Set<Post> myPosts;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private List<Comment> myComments;
+    private Set<Comment> myComments;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
-    private List<Like> myLikes;
+    private Set<Like> myLikes;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "recipient", cascade = CascadeType.ALL)
-    private List<Messenger> messagesToMe;
+    private Set<Messenger> messagesToMe;
 
     @Override
     public boolean equals(Object o) {
