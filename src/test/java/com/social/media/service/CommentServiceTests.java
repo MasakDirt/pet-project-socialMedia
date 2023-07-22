@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
@@ -38,10 +39,10 @@ public class CommentServiceTests {
     }
 
     @Test
-    public void test_InjectedComponent() {
-        AssertionsForClassTypes.assertThat(commentService).isNotNull();
-        AssertionsForClassTypes.assertThat(userService).isNotNull();
-        AssertionsForClassTypes.assertThat(postService).isNotNull();
+    public void test_Injected_Component() {
+        assertThat(commentService).isNotNull();
+        assertThat(userService).isNotNull();
+        assertThat(postService).isNotNull();
     }
 
     @BeforeEach
@@ -102,7 +103,7 @@ public class CommentServiceTests {
         Comment actual = commentService.readById(expected.getId());
 
         assertEquals(expected, actual,
-                "");
+                "After reading by id expected and actual objects must be Equal.");
     }
 
     @Test
