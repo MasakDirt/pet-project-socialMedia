@@ -17,13 +17,8 @@ public class CommentService {
     private final UserService userService;
     private final PostService postService;
 
-    private static final String COMMENT_MESSAGE_FOR_EXC = "Comment need to be filled";
-
     public Comment create(long ownerId, long postId, String comment) {
-
-        if (comment == null || comment.trim().isEmpty()) {
-            throw new InvalidTextException(COMMENT_MESSAGE_FOR_EXC);
-        }
+        checkValidComment(comment);
 
         Comment commentObj = new Comment();
         commentObj.setComment(comment);
@@ -39,9 +34,7 @@ public class CommentService {
     }
 
     public Comment update(long id, String updatedComment) {
-        if (updatedComment == null || updatedComment.trim().isEmpty()) {
-            throw new InvalidTextException(COMMENT_MESSAGE_FOR_EXC);
-        }
+        checkValidComment(updatedComment);
 
         var oldComment = readById(id);
         oldComment.setComment(updatedComment);
@@ -55,5 +48,11 @@ public class CommentService {
 
     public Set<Comment> getAll() {
         return new HashSet<>(commentRepository.findAll());
+    }
+
+    private void checkValidComment(String comment) throws InvalidTextException {
+        if (comment == null || comment.trim().isEmpty()) {
+            throw new InvalidTextException("Comment need to be filled");
+        }
     }
 }
