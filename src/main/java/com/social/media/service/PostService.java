@@ -1,12 +1,11 @@
 package com.social.media.service;
 
+import com.social.media.exception.InvalidTextException;
 import com.social.media.minio.MinioClientImpl;
 import com.social.media.model.entity.Post;
 import com.social.media.repository.PostRepository;
 import io.minio.errors.*;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +13,8 @@ import java.io.File;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -21,12 +22,14 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserService userService;
 
-    public Post create(
-            long ownerId,
-            @NotNull String description,
-            @NotNull @NotBlank(message = "Photo file path cannot be blank") String photoFile
-    ) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException,
+    public Post create(long ownerId, String description, String photoFile) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException,
             InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+
+        checkDescriptionForNull(description);
+
+        if (photoFile == null || photoFile.trim().isEmpty()) {
+            throw new InvalidTextException("You need to paste a photo");
+        }
 
         var owner = userService.readById(ownerId);
         makeBucketAndPutPhotoToMinIO(owner.getUsername(), photoFile);
@@ -43,13 +46,21 @@ public class PostService {
                 new EntityNotFoundException("Post with id " + id + " not found!"));
     }
 
-    public Post update(@NotNull Post updatedPost) {
-        readById(updatedPost.getId());
-        return postRepository.save(updatedPost);
+    public Post update(long postId, String updatedDescription) {
+        checkDescriptionForNull(updatedDescription);
+
+        var oldPost = readById(postId);
+        oldPost.setDescription(updatedDescription);
+
+        return postRepository.save(oldPost);
     }
 
     public void delete(long id) {
         postRepository.delete(readById(id));
+    }
+
+    public Set<Post> getAll() {
+        return new HashSet<>(postRepository.findAll());
     }
 
     private void makeBucketAndPutPhotoToMinIO(String username, String file) throws ServerException, InsufficientDataException, ErrorResponseException,
@@ -60,5 +71,11 @@ public class PostService {
             minioClient.makeBucketWithUsername(username);
         }
         minioClient.putPhoto(username, file);
+    }
+
+    private void checkDescriptionForNull(String description) {
+        if (description == null){
+            throw new InvalidTextException("Description can be blank, but not null!");
+        }
     }
 }
