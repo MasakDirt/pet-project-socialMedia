@@ -4,8 +4,6 @@ import com.social.media.exception.InvalidTextException;
 import com.social.media.exception.SameUsersException;
 import com.social.media.model.entity.Messenger;
 import jakarta.persistence.EntityNotFoundException;
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
