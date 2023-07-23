@@ -146,10 +146,7 @@ public class SocialMediaApplication implements CommandLineRunner {
     }
 
     private Role createRole(String name) {
-        Role role = new Role();
-        role.setName(name);
-
-        var created = roleService.create(role);
+        var created = roleService.create(name);
         log.info("Role with name {} was created!", name);
         return created;
     }
