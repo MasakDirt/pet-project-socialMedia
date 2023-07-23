@@ -21,7 +21,7 @@ public class Role implements GrantedAuthority {
     private long id;
 
     @NotNull
-    @Pattern(regexp = "^[A-Z]+$")
+    @Pattern(regexp = "^[A-Z._-]+$")
     @Column(unique = true, nullable = false)
     private String name;
 
