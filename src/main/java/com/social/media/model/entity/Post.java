@@ -55,7 +55,7 @@ public class Post {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Post post = (Post) o;
-        return id == post.id && timestamp.toLocalTime().equals(post.timestamp.toLocalTime()) && Objects.equals(owner, post.owner);
+        return id == post.id && timestamp.toLocalDate().equals(post.timestamp.toLocalDate()) && Objects.equals(owner, post.owner);
     }
 
     @Override
