@@ -42,7 +42,7 @@ public class MessengerRepositoryTests {
         expected.setOwner(owner);
         expected.setRecipient(recipient);
 
-        Messenger actual = messengerRepository.findByOwnerAndRecipient(owner, recipient).orElse(new Messenger());
+        Messenger actual = messengerRepository.findByOwnerAndRecipient(owner, recipient);
         expected.setId(actual.getId());
 
         Assertions.assertEquals(expected, actual,
