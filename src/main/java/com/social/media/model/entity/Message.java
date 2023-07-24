@@ -43,7 +43,7 @@ public class Message {
         if (o == null || getClass() != o.getClass()) return false;
         Message messageObj = (Message) o;
         return id == messageObj.id && Objects.equals(message, messageObj.message) &&
-                Objects.equals(timestamp.toLocalTime(), messageObj.timestamp.toLocalTime()) && Objects.equals(messenger, messageObj.messenger);
+                Objects.equals(timestamp.toLocalDate(), messageObj.timestamp.toLocalDate()) && Objects.equals(messenger, messageObj.messenger);
     }
 
     @Override
@@ -55,8 +55,7 @@ public class Message {
     public String toString() {
         return "Message{" +
                 "id=" + id +
-                ", message='" + message + '\'' +
-                ", messenger=" + messenger +
+                ", message='" + message +
                 '}';
     }
 }

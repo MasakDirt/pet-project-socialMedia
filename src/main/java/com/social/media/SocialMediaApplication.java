@@ -146,10 +146,7 @@ public class SocialMediaApplication implements CommandLineRunner {
     }
 
     private Role createRole(String name) {
-        Role role = new Role();
-        role.setName(name);
-
-        var created = roleService.create(role);
+        var created = roleService.create(name);
         log.info("Role with name {} was created!", name);
         return created;
     }
@@ -176,10 +173,7 @@ public class SocialMediaApplication implements CommandLineRunner {
     }
 
     private void createComment(long ownerId, long postId, String comment) {
-        Comment commentObj = new Comment();
-        commentObj.setComment(comment);
-
-        var created = commentService.create(ownerId, postId, commentObj);
+        var created = commentService.create(ownerId, postId, comment);
         log.info("{} post has been successfully commented by {}", created.getPost().getOwner().getName(), created.getOwner().getName());
     }
 

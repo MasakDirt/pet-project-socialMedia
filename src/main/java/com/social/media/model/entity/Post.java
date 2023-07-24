@@ -10,8 +10,8 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.File;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -40,11 +40,11 @@ public class Post {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<Comment> comments;
+    private Set<Comment> comments;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
-    private List<Like> likes;
+    private Set<Like> likes;
 
     public Post() {
         this.timestamp = LocalDateTime.now();
@@ -55,7 +55,7 @@ public class Post {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Post post = (Post) o;
-        return id == post.id && timestamp.toLocalTime().equals(post.timestamp.toLocalTime()) && Objects.equals(owner, post.owner);
+        return id == post.id && timestamp.toLocalDate().equals(post.timestamp.toLocalDate()) && Objects.equals(owner, post.owner);
     }
 
     @Override

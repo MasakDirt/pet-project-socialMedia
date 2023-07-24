@@ -6,6 +6,9 @@ import io.minio.messages.Bucket;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -44,13 +47,17 @@ public class MinioClientImpl {
 
     public void getPhoto(String username, String fileName) throws IOException, ServerException,
             InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        DownloadObjectArgs dArgs = DownloadObjectArgs.builder()
-                .bucket(username)
-                .object(fileName)
-                .filename(fileName)
-                .build();
 
-        minioClient.downloadObject(dArgs);
+        Path path = Paths.get("downloaded/" + fileName);
+
+        creatingFolderForGettingPhoto(path);
+
+        try {
+            downloadObject(username, fileName, path);
+        } catch (IllegalArgumentException illegalArgumentException) { // it`s for catching exception about 'we already have this file', so we delete it, and create new!
+            Files.delete(path);
+            downloadObject(username, fileName, path);
+        }
     }
 
     public boolean isBucketExist(String username) {
@@ -75,5 +82,24 @@ public class MinioClientImpl {
                 .endpoint("https://play.min.io")
                 .credentials("Q3AM3UQ867SPQQA43P2F", "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG")
                 .build();
+    }
+
+    private void creatingFolderForGettingPhoto(Path path) throws IOException {
+        if (!Files.exists(path)) {
+            Files.createDirectories(path);
+            log.info("New folder with path: {}, is created", path);
+        }
+    }
+
+    private void downloadObject(String username, String fileName, Path path) throws IOException, ServerException,
+            InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+
+        DownloadObjectArgs dArgs = DownloadObjectArgs.builder()
+                .bucket(username)
+                .object(fileName)
+                .filename(path.toString())
+                .build();
+
+        minioClient.downloadObject(dArgs);
     }
 }
