@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.io.File;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
@@ -28,9 +27,6 @@ public class Post {
     private LocalDateTime timestamp;
 
     @NotNull
-    private File photo;
-
-    @NotNull
     private String description;
 
     @JsonBackReference
@@ -45,6 +41,10 @@ public class Post {
     @JsonManagedReference
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private Set<Like> likes;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private Set<Photo> photos;
 
     public Post() {
         this.timestamp = LocalDateTime.now();
