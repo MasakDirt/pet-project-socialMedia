@@ -1,9 +1,13 @@
 package com.social.media.minio;
 
+import com.social.media.exception.BucketCreationException;
+import com.social.media.exception.ConnectionToMinIOFailed;
 import io.minio.*;
 import io.minio.errors.*;
 import io.minio.messages.Bucket;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,11 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@Component
 public class MinioClientImpl {
     private static final MinioClient minioClient = getMinioClient();
 
     public void makeBucketWithUsername(String username) throws ServerException,
-            InsufficientDataException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+            InsufficientDataException, InvalidResponseException, XmlParserException, InternalException {
         try {
             minioClient.makeBucket(
                     MakeBucketArgs
@@ -28,9 +33,12 @@ public class MinioClientImpl {
                             .build()
             );
         } catch (ErrorResponseException responseException) {
-            log.info("Your previous request to create the named bucket succeeded and you already own it.");
+            log.warn("Your previous request to create the named bucket succeeded and you already own it.");
+        } catch (MinioException minioException) {
+            throw new ConnectionToMinIOFailed("Connection failed: " + minioException.getMessage());
+        } catch (Exception exception) {
+            throw new BucketCreationException("While post is creating exception was throwing: " + exception.getMessage());
         }
-
     }
 
     public ObjectWriteResponse putPhoto(String username, String fileName) throws IOException, ServerException,
@@ -48,15 +56,14 @@ public class MinioClientImpl {
     public void getPhoto(String username, String fileName) throws IOException, ServerException,
             InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
 
-        Path path = Paths.get("downloaded/" + fileName);
+        Path pathForFolder = Paths.get("downloaded/photos");
+        Path pathForPhoto = Paths.get("downloaded/" + fileName);
 
-        creatingFolderForGettingPhoto(path);
+        creatingFolderForGettingPhoto(pathForFolder);
 
-        if (isDirectoryExist(path)) {
-            Files.delete(path); // if we already have it photo, we delete it and then download new!
+        if (!isDirectoryExist(pathForPhoto)){
+            downloadObject(username, fileName, pathForPhoto);
         }
-
-        downloadObject(username, fileName, path);
     }
 
     public boolean isBucketExist(String username) {
@@ -65,11 +72,19 @@ public class MinioClientImpl {
                 .anyMatch(bucket -> bucket.name().equals(username));
     }
 
+    public Bucket getBucketByName(String username) {
+       return getBuckets()
+                .stream()
+                .filter(bucket -> bucket.name().equals(username))
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("Bucket with name " + username + " not found"));
+    }
+
     public boolean isDirectoryExist(Path path) {
         return Files.exists(path);
     }
 
-    private List<Bucket> getBuckets() {
+    public List<Bucket> getBuckets() {
         try {
             return minioClient.listBuckets();
         } catch (MinioException minioException) {
