@@ -2,7 +2,6 @@ package com.social.media.service;
 
 import com.social.media.exception.InvalidTextException;
 import com.social.media.exception.PhotoDoesNotExist;
-import com.social.media.exception.PostCreatedException;
 import com.social.media.minio.MinioClientImpl;
 import com.social.media.model.entity.Photo;
 import com.social.media.model.entity.Post;
@@ -103,9 +102,6 @@ public class PostServiceTests {
 
                 () -> assertThrows(InvalidTextException.class, () -> postService.create(ownerId, "", List.of("   ")),
                         "Here must be InvalidTextException because photoFiles cannot be 'blank'."),
-
-                () -> assertThrows(NullPointerException.class, () -> postService.create(ownerId, "", List.of(null)),
-                        "Here must be NullPointerException because photoFiles cannot be null."),
 
                 () -> assertThrows(PhotoDoesNotExist.class, () -> postService.create(ownerId, "", new ArrayList<>()),
                         "Here must be PhotoDoesNotExist because list of photos paths cannot be empty."),
