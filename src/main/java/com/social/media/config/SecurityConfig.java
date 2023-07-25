@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -19,11 +21,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final AuthTokenFilter authenticationTokenFilter;
     private final AuthEntryPointJwt authEntryPointJwt;
+    private final CorsConfigurationSource configurationSource;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        // disable cors and csrf!
-        httpSecurity.cors(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable);
+        // settings of cors and disable csrf(I have my token)!
+        httpSecurity
+                .cors(
+                        cors -> cors.configurationSource(configurationSource)
+                )
+                .csrf(AbstractHttpConfigurer::disable);
 
         // added exception handling and authorize requests!
         httpSecurity
