@@ -52,18 +52,21 @@ public class MinioClientImpl {
 
         creatingFolderForGettingPhoto(path);
 
-        try {
-            downloadObject(username, fileName, path);
-        } catch (IllegalArgumentException illegalArgumentException) { // it`s for catching exception about 'we already have this file', so we delete it, and create new!
-            Files.delete(path);
-            downloadObject(username, fileName, path);
+        if (isDirectoryExist(path)) {
+            Files.delete(path); // if we already have it photo, we delete it and then download new!
         }
+
+        downloadObject(username, fileName, path);
     }
 
     public boolean isBucketExist(String username) {
         return !getBuckets().isEmpty() && getBuckets()
                 .stream()
                 .anyMatch(bucket -> bucket.name().equals(username));
+    }
+
+    public boolean isDirectoryExist(Path path) {
+        return Files.exists(path);
     }
 
     private List<Bucket> getBuckets() {
@@ -91,13 +94,13 @@ public class MinioClientImpl {
         }
     }
 
-    private void downloadObject(String username, String fileName, Path path) throws IOException, ServerException,
+    private void downloadObject(String username, String fileName, Path destinationPath) throws IOException, ServerException,
             InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
 
         DownloadObjectArgs dArgs = DownloadObjectArgs.builder()
                 .bucket(username)
                 .object(fileName)
-                .filename(path.toString())
+                .filename(destinationPath.toString())
                 .build();
 
         minioClient.downloadObject(dArgs);

@@ -2,7 +2,6 @@ package com.social.media;
 
 import com.social.media.model.entity.*;
 import com.social.media.service.*;
-import io.minio.errors.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -12,8 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Properties;
 
 @Slf4j
@@ -70,7 +68,7 @@ public class SocialMediaApplication implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         log.info("SocialMediaApplication has been started!!!");
 
         Role admin = createRole("ADMIN");
@@ -79,18 +77,18 @@ public class SocialMediaApplication implements CommandLineRunner {
         creatingUsers(admin, user);
     }
 
-    private void creatingUsers(Role admin, Role userRole) throws Exception {
+    private void creatingUsers(Role admin, Role userRole) {
 //      USERS
         long adminId = createUser("Vito", "Jones", "skallet24", "jone@mail.co", "1111", admin);
         long garryId = createUser("Garry", "Thomas", "garry.potter", "garry@mail.co", "2222", userRole);
         long oliviaId = createUser("Olivia", "Rodriguez", "oil", "olivia@mail.co", "3333", userRole);
 
 //      POSTS
-        long post1Id = createPost(adminId, "My first photo", "photos/nature-photography.webp");
-        long post2Id = createPost(oliviaId, "My caaaat♡♡♡", "photos/catshark.webp");
-        long post3Id = createPost(garryId, "Machine that I want", "photos/mcLaren.jpg");
-        long post4Id = createPost(adminId, "Look which girl I have been drown", "photos/girl.webp");
-        long post5Id = createPost(garryId, "I really like green color☺☺☺", "photos/green.jpg");
+        long post1Id = createPost(adminId, "My first photo", List.of("photos/nature-photography.webp"));
+        long post2Id = createPost(oliviaId, "My caaaat`s♡♡♡", List.of("photos/catshark.webp", "photos/small_cat.jpg"));
+        long post3Id = createPost(garryId, "Machines that I want", List.of("photos/mcLaren.jpg", "photos/bmwi4.jpg"));
+        long post4Id = createPost(adminId, "Look which girl I have been drown", List.of("photos/girl.webp"));
+        long post5Id = createPost(garryId, "I really like green color☺☺☺", List.of("photos/green.jpg"));
 
 //      COMMENTS
         createComment(garryId, post1Id, "Nice photo");
@@ -165,8 +163,7 @@ public class SocialMediaApplication implements CommandLineRunner {
         return created.getId();
     }
 
-    private long createPost(long ownerId, String description, String photoFile) throws ServerException, InsufficientDataException, ErrorResponseException,
-            IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    private long createPost(long ownerId, String description, List<String> photoFile) {
         var created = postService.create(ownerId, description, photoFile);
         log.info("{} posted photo with description {}", created.getOwner().getName(), created.getDescription());
         return created.getId();
