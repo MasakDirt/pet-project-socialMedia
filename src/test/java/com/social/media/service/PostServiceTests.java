@@ -1,7 +1,10 @@
 package com.social.media.service;
 
 import com.social.media.exception.InvalidTextException;
+import com.social.media.exception.PhotoDoesNotExist;
+import com.social.media.exception.PostCreatedException;
 import com.social.media.minio.MinioClientImpl;
+import com.social.media.model.entity.Photo;
 import com.social.media.model.entity.Post;
 import com.social.media.model.entity.User;
 import io.minio.errors.*;
@@ -20,6 +23,8 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
@@ -62,18 +67,21 @@ public class PostServiceTests {
     }
 
     @Test
-    public void test_Valid_Create() throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
-            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public void test_Valid_Create() {
         long ownerId = 2L;
         String description = "";
         String file = "photos/catshark.webp";
 
+        Photo photo = new Photo();
+        photo.setFile(new File(file));
+
         Post expected = new Post();
         expected.setOwner(userService.readById(ownerId));
         expected.setDescription(description);
-        expected.setPhoto(new File(file));
+        expected.setPhotos(Set.of(photo));
+        photo.setPost(expected);
 
-        Post actual = postService.create(ownerId, description, file);
+        Post actual = postService.create(ownerId, description, List.of(file));
         expected.setId(actual.getId());
 
         assertTrue(posts.size() < postService.getAll().size(),
@@ -87,17 +95,23 @@ public class PostServiceTests {
         long ownerId = 2L;
         String photoFile = "photos/mcLaren.jpg";
         assertAll(
-                () -> assertThrows(EntityNotFoundException.class, () -> postService.create(0L, "", photoFile),
+                () -> assertThrows(EntityNotFoundException.class, () -> postService.create(0L, "", List.of(photoFile)),
                         "Here must be EntityNotFoundException because we have not user with id 0."),
 
-                () -> assertThrows(InvalidTextException.class, () -> postService.create(ownerId, null, photoFile),
+                () -> assertThrows(InvalidTextException.class, () -> postService.create(ownerId, null, List.of(photoFile)),
                         "Here must be InvalidTextException because description cannot be null."),
 
-                () -> assertThrows(InvalidTextException.class, () -> postService.create(ownerId, "", ""),
-                        "Here must be InvalidTextException because photoFile cannot be 'blank'."),
+                () -> assertThrows(InvalidTextException.class, () -> postService.create(ownerId, "", List.of("   ")),
+                        "Here must be InvalidTextException because photoFiles cannot be 'blank'."),
 
-                () -> assertThrows(InvalidTextException.class, () -> postService.create(ownerId, "", null),
-                        "Here must be InvalidTextException because photoFile cannot be null.")
+                () -> assertThrows(NullPointerException.class, () -> postService.create(ownerId, "", List.of(null)),
+                        "Here must be NullPointerException because photoFiles cannot be null."),
+
+                () -> assertThrows(PhotoDoesNotExist.class, () -> postService.create(ownerId, "", new ArrayList<>()),
+                        "Here must be PhotoDoesNotExist because list of photos paths cannot be empty."),
+
+                () -> assertThrows(PhotoDoesNotExist.class, () -> postService.create(ownerId, "", null),
+                        "Here must be PhotoDoesNotExist because list of photos paths cannot be null.")
         );
     }
 
@@ -107,20 +121,19 @@ public class PostServiceTests {
         User owner = userService.readById(2L);
         String photoFile = "photos/girl.webp";
 
-        Post post = postService.create(owner.getId(), "description", photoFile);
+        Post post = postService.create(owner.getId(), "description", List.of(photoFile));
 
         MinioClientImpl minioClient = new MinioClientImpl();
         minioClient.getPhoto(owner.getUsername(), photoFile);
 
-        assertEquals(post.getPhoto().getName(), new File("downloaded/" + photoFile).getName(),
+        assertEquals(post.getPhotos().iterator().next().getFile().getName(), new File("downloaded/" + photoFile).getName(),
                 "Files names must be equal, but with directories they don`t equal.");
     }
 
     @Test
-    public void test_Valid_ReadById() throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
-            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public void test_Valid_ReadById() {
 
-        Post expected = postService.create(1L, "", "photos/nature-photography.webp");
+        Post expected = postService.create(1L, "", List.of("photos/nature-photography.webp"));
         Post actual = postService.readById(expected.getId());
 
         assertEquals(expected, actual,
@@ -141,7 +154,7 @@ public class PostServiceTests {
         Post post = postService.readById(postId);
         long oldId = post.getId();
         String oldDescription = post.getDescription();
-        File oldPhoto = post.getPhoto();
+        Set<Photo> oldPhotos = post.getPhotos();
         User oldOwner = post.getOwner();
         LocalDateTime oldTime = post.getTimestamp();
 
@@ -151,7 +164,7 @@ public class PostServiceTests {
                 () -> assertEquals(oldId, actual.getId(),
                         "Id`s after updating must not change!"),
 
-                () -> assertEquals(oldPhoto, actual.getPhoto(),
+                () -> assertEquals(oldPhotos, actual.getPhotos(),
                         "Photo`s after updating must not change!"),
 
                 () -> assertEquals(oldOwner, actual.getOwner(),

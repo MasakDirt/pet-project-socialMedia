@@ -1,5 +1,6 @@
 package com.social.media.model;
 
+import com.social.media.model.entity.Photo;
 import com.social.media.model.entity.Post;
 import com.social.media.model.entity.User;
 import jakarta.validation.ConstraintViolation;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 import static com.social.media.model.ValidatorHelperForTests.getViolations;
@@ -20,11 +22,15 @@ public class PostTests {
 
     @BeforeAll
     public static void init() {
+        Photo photo = new Photo();
+        photo.setFile(new File("photos/nature-photography.webp"));
+
         validPost = new Post();
-        validPost.setPhoto(new File("photos/nature-photography.webp"));
+        validPost.setPhotos(Set.of(photo));
         validPost.setTimestamp(LocalDateTime.now());
         validPost.setOwner(new User());
         validPost.setDescription("Description");
+        photo.setPost(validPost);
     }
 
     @Test
@@ -35,20 +41,9 @@ public class PostTests {
     }
 
     @Test
-    public void test_Invalid_Photo() {
-        Post invalid = new Post();
-        invalid.setPhoto(null);
-        invalid.setTimestamp(LocalDateTime.now());
-        invalid.setDescription("");
-
-        Set<ConstraintViolation<Post>> violations = getViolations(invalid);
-        Assertions.assertEquals(1, violations.size());
-    }
-
-    @Test
     public void test_Invalid_Timestamp() {
         Post invalid = new Post();
-        invalid.setPhoto(new File("photos/nature-photography.webp"));
+        invalid.setPhotos(new HashSet<>());
         invalid.setDescription("");
         invalid.setTimestamp(null);
 
@@ -59,7 +54,7 @@ public class PostTests {
     @Test
     public void test_Invalid_Description() {
         Post invalid = new Post();
-        invalid.setPhoto(new File("photos/nature-photography.webp"));
+        invalid.setPhotos(new HashSet<>());
         invalid.setDescription(null);
         invalid.setTimestamp(LocalDateTime.now());
 
