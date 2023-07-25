@@ -1,7 +1,11 @@
 package com.social.media.service;
 
+import com.social.media.exception.ConnectionToMinIOFailed;
 import com.social.media.exception.InvalidTextException;
+import com.social.media.exception.PhotoDoesNotExist;
+import com.social.media.exception.PostCreatedException;
 import com.social.media.minio.MinioClientImpl;
+import com.social.media.model.entity.Photo;
 import com.social.media.model.entity.Post;
 import com.social.media.repository.PostRepository;
 import io.minio.errors.*;
@@ -10,10 +14,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -21,23 +23,17 @@ import java.util.Set;
 public class PostService {
     private final PostRepository postRepository;
     private final UserService userService;
+    private final PhotoService photoService;
 
-    public Post create(long ownerId, String description, String photoFile) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException,
-            InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-
+    public Post create(long ownerId, String description, List<String> filePaths) {
         checkDescriptionForNull(description);
 
-        if (photoFile == null || photoFile.trim().isEmpty()) {
-            throw new InvalidTextException("You need to paste a photo");
-        }
+        checkPathsForNull(filePaths);
 
-        var owner = userService.readById(ownerId);
-        makeBucketAndPutPhotoToMinIO(owner.getUsername(), photoFile);
+        var post = saveToDB(ownerId, description);
+        var photos = getPhotos(filePaths, post);
+        post.setPhotos(photos);
 
-        var post = new Post();
-        post.setPhoto(new File(photoFile));
-        post.setDescription(description);
-        post.setOwner(owner);
         return postRepository.save(post);
     }
 
@@ -63,19 +59,79 @@ public class PostService {
         return new HashSet<>(postRepository.findAll());
     }
 
-    private void makeBucketAndPutPhotoToMinIO(String username, String file) throws ServerException, InsufficientDataException, ErrorResponseException,
-            IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    private Set<Photo> getPhotos(List<String> filePaths, Post post) {
+        var photos = createNewPhotos(new HashSet<>(), filePaths, post);
+        makeBucketAndPutPhotoToMinIO(post.getOwner().getUsername(), filePaths);
 
+        return photos;
+    }
+
+    private Set<Photo> createNewPhotos(Set<Photo> photos, List<String> filePaths, Post post) {
+        filePaths.forEach(path -> {
+            var photo = new Photo();
+            photo.setPost(post);
+            photo.setFile(new File(path));
+            photos.add(photoService.create(photo));
+        });
+        return photos;
+    }
+
+    private Post saveToDB(long ownerId, String description) {
+        var owner = userService.readById(ownerId);
+
+        var post = new Post();
+        post.setDescription(description);
+        post.setOwner(owner);
+        return postRepository.save(post);
+    }
+
+    private void makeBucketAndPutPhotoToMinIO(String username, List<String> filePaths) {
         MinioClientImpl minioClient = new MinioClientImpl();
+        makeBucketIfIsNotExist(minioClient, username);
+
+        putPhotos(minioClient, username, filePaths);
+    }
+
+    private void makeBucketIfIsNotExist(MinioClientImpl minioClient, String username) {
         if (!minioClient.isBucketExist(username)) {
-            minioClient.makeBucketWithUsername(username);
+            try {
+                minioClient.makeBucketWithUsername(username);
+            } catch (MinioException minioException) {
+                throw new ConnectionToMinIOFailed("Connection failed: " + minioException.getMessage());
+            } catch (Exception exception) {
+                throw new PostCreatedException("While post is creating exception was throwing: " + exception.getMessage());
+            }
         }
-        minioClient.putPhoto(username, file);
+    }
+
+    private void putPhotos(MinioClientImpl minioClient, String username, List<String> photosPaths) {
+        photosPaths.forEach(photo -> {
+                    try {
+                        minioClient.putPhoto(username, photo);
+                    } catch (MinioException minioException) {
+                        throw new ConnectionToMinIOFailed("Connection failed: " + minioException.getMessage());
+                    } catch (Exception exception) {
+                        throw new PostCreatedException("While post is creating exception was throwing: " + exception.getMessage());
+                    }
+                }
+        );
     }
 
     private void checkDescriptionForNull(String description) {
-        if (description == null){
+        if (description == null) {
             throw new InvalidTextException("Description can be blank, but not null!");
         }
+    }
+
+    private void checkPathsForNull(List<String> paths) {
+        if (paths == null || paths.isEmpty()) {
+            throw new PhotoDoesNotExist("You need to paste at least one photo");
+        }
+
+        paths.forEach(path -> {
+            if (path.trim().isEmpty()){
+                throw new InvalidTextException("You need to write valid photo path");
+            }
+        });
     }
 }
