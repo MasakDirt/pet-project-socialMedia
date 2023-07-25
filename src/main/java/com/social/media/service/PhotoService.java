@@ -15,12 +15,12 @@ import java.util.Set;
 public class PhotoService {
     private final PhotoRepository photoRepository;
 
-        public Photo create(Photo photo) {
-            if (photo != null) {
-                return photoRepository.save(photo);
-            }
-            throw new IllegalArgumentException("Photo cannot be 'null'");
+    public Photo create(Photo photo) {
+        if (photo != null) {
+            return photoRepository.save(photo);
         }
+        throw new IllegalArgumentException("Photo cannot be 'null'");
+    }
 
     public Photo readById(long id) {
         return photoRepository.findById(id).orElseThrow(() ->
@@ -31,7 +31,7 @@ public class PhotoService {
         photoRepository.delete(readById(id));
     }
 
-    public Set<Photo> getAll(){
+    public Set<Photo> getAll() {
         return new HashSet<>(photoRepository.findAll());
     }
 }
