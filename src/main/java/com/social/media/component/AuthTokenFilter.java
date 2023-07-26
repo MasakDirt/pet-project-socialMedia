@@ -23,10 +23,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
     private final UserService userService;
 
-    private static final String STARTS_TOKEN = "Bearer ";
+    private static final String HEADER_PREFIX = "Bearer ";
 
     @Override
-    protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response,
+    public void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
         if (hasAuthorizationBearer(request)) {
             String token = getAccessToken(request);
@@ -39,11 +39,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private boolean hasAuthorizationBearer(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
-        return Objects.nonNull(header) && header.startsWith(STARTS_TOKEN);
+        return Objects.nonNull(header) && header.startsWith(HEADER_PREFIX);
     }
 
     private String getAccessToken(HttpServletRequest request) {
-        return request.getHeader("Authorization").substring(STARTS_TOKEN.length());
+        return request.getHeader("Authorization").substring(HEADER_PREFIX.length());
     }
 
     private void setAuthContext(String token, HttpServletRequest request) {
