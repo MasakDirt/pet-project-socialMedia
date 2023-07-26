@@ -54,7 +54,7 @@ public class UserService {
         checkValidString(username, "Username must contains letters in lower case and can contain '-' or '.'");
 
         return userRepository.findByUsername(username).orElseThrow(() ->
-                new EntityNotFoundException("User with username " + username + "not found!"));
+                new EntityNotFoundException("User with username " + username + " not found!"));
     }
 
     public User readByEmail(String email) {
