@@ -103,10 +103,7 @@ public class MinioClientImplTests {
             ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException {
 
         minioClient.makeBucketWithUsername(bucketName);
-        minioClient.putPhoto(bucketName, photoPath);
-
-        assertEquals(buckets.size(), minioClient.getBuckets().size(),
-                "We already create this bucket so buckets lists should be same.");
+        assertThat(minioClient.putPhoto(bucketName, photoPath)).isNotNull();
     }
 
     @Test
