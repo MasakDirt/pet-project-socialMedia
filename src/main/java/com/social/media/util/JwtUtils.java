@@ -1,5 +1,6 @@
 package com.social.media.util;
 
+import com.social.media.exception.InvalidTextException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,10 @@ public class JwtUtils {
     private long inspirationMs;
 
     public String generateTokenFromUsername(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new InvalidTextException("Username must contain at least one letter");
+        }
+
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
@@ -26,7 +31,9 @@ public class JwtUtils {
                 .compact();
     }
 
-    public boolean validJwtToken(String token) {
+    public boolean isJwtTokenValid(String token) {
+        isValidToken(token);
+
         try {
             Jwts.parserBuilder()
                     .setSigningKey(key).build().parseClaimsJws(token);
@@ -45,11 +52,19 @@ public class JwtUtils {
     }
 
     public String getSubject(String token) {
+        isValidToken(token);
+
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    private void isValidToken(String checking) {
+        if (checking == null || checking.trim().isEmpty() || checking.length() < 10) {
+            throw new InvalidTextException("Token must contain at least 10 letters.");
+        }
     }
 }
