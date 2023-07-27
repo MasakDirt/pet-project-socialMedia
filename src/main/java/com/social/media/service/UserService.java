@@ -5,7 +5,10 @@ import com.social.media.model.entity.User;
 import com.social.media.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
 import java.util.List;
@@ -15,9 +18,11 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public User create(User user) {
         if (user != null) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             return userRepository.save(user);
         }
         throw new IllegalArgumentException("User cannot be blank!");
@@ -28,10 +33,15 @@ public class UserService {
                 new EntityNotFoundException("User with id " + id + "not found!"));
     }
 
-    public User update(User updatedUser) {
+    public User update(User updatedUser, String oldPassword) {
+        checkValidString(oldPassword, "Password must contain at least one letter!");
+
         if (updatedUser != null) {
-            readById(updatedUser.getId());
-            return userRepository.save(updatedUser);
+            var oldUser = readById(updatedUser.getId());
+            if (passwordEncoder.matches(oldPassword, oldUser.getPassword())) {
+                return create(updatedUser);
+            }
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong old password");
         }
         throw new IllegalArgumentException("User cannot be blank!");
     }
@@ -44,7 +54,7 @@ public class UserService {
         checkValidString(username, "Username must contains letters in lower case and can contain '-' or '.'");
 
         return userRepository.findByUsername(username).orElseThrow(() ->
-                new EntityNotFoundException("User with username " + username + "not found!"));
+                new EntityNotFoundException("User with username " + username + " not found!"));
     }
 
     public User readByEmail(String email) {

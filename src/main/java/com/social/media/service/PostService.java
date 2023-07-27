@@ -3,7 +3,7 @@ package com.social.media.service;
 import com.social.media.exception.ConnectionToMinIOFailed;
 import com.social.media.exception.InvalidTextException;
 import com.social.media.exception.PhotoDoesNotExist;
-import com.social.media.exception.PostCreatedException;
+import com.social.media.exception.PostCreationException;
 import com.social.media.minio.MinioClientImpl;
 import com.social.media.model.entity.Photo;
 import com.social.media.model.entity.Post;
@@ -24,6 +24,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final UserService userService;
     private final PhotoService photoService;
+    private final MinioClientImpl minioClient;
 
     public Post create(long ownerId, String description, List<String> filePaths) {
         checkDescriptionForNull(description);
@@ -86,32 +87,31 @@ public class PostService {
     }
 
     private void makeBucketAndPutPhotoToMinIO(String username, List<String> filePaths) {
-        MinioClientImpl minioClient = new MinioClientImpl();
-        makeBucketIfIsNotExist(minioClient, username);
+        makeBucketIfIsNotExist(username);
 
-        putPhotos(minioClient, username, filePaths);
+        putPhotos(username, filePaths);
     }
 
-    private void makeBucketIfIsNotExist(MinioClientImpl minioClient, String username) {
+    private void makeBucketIfIsNotExist(String username) {
         if (!minioClient.isBucketExist(username)) {
             try {
                 minioClient.makeBucketWithUsername(username);
             } catch (MinioException minioException) {
                 throw new ConnectionToMinIOFailed("Connection failed: " + minioException.getMessage());
             } catch (Exception exception) {
-                throw new PostCreatedException("While post is creating exception was throwing: " + exception.getMessage());
+                throw new PostCreationException("While post is creating exception was throwing: " + exception.getMessage());
             }
         }
     }
 
-    private void putPhotos(MinioClientImpl minioClient, String username, List<String> photosPaths) {
+    private void putPhotos(String username, List<String> photosPaths) {
         photosPaths.forEach(photo -> {
                     try {
                         minioClient.putPhoto(username, photo);
                     } catch (MinioException minioException) {
                         throw new ConnectionToMinIOFailed("Connection failed: " + minioException.getMessage());
                     } catch (Exception exception) {
-                        throw new PostCreatedException("While post is creating exception was throwing: " + exception.getMessage());
+                        throw new PostCreationException("While post is creating exception was throwing: " + exception.getMessage());
                     }
                 }
         );

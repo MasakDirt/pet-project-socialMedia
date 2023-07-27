@@ -3,12 +3,12 @@ package com.social.media.service;
 import com.social.media.exception.InvalidTextException;
 import com.social.media.model.entity.User;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,12 +26,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 public class UserServiceTests {
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     private Set<User> users;
 
     @Autowired
-    public UserServiceTests(UserService userService) {
+    public UserServiceTests(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @BeforeEach
@@ -42,6 +44,7 @@ public class UserServiceTests {
     @Test
     public void test_Injected_Component() {
         assertThat(userService).isNotNull();
+        assertThat(passwordEncoder).isNotNull();
         assertThat(users).isNotNull();
     }
 
@@ -77,8 +80,8 @@ public class UserServiceTests {
         assertAll(
                 () -> assertThrows(IllegalArgumentException.class, () -> userService.create(null),
                         "Here must be IllegalArgumentException because we cannot pass the null!"),
-                () -> assertThrows(ConstraintViolationException.class, () -> userService.create(new User()),
-                        "Here must be ConstraintViolationException because we cannot pass new User without initialize fields.")
+                () -> assertThrows(IllegalArgumentException.class, () -> userService.create(new User()),
+                        "Here must be IllegalArgumentException because we cannot pass new User without initialize fields.")
         );
     }
 
@@ -106,18 +109,29 @@ public class UserServiceTests {
 
     @Test
     public void test_Valid_Update() {
+        long userId = 2L;
         String newPassword = "UpdatedPass";
 
-        User expected = userService.readById(2L);
+        User user = userService.readById(userId);
+
+        User expected = new User();
+        expected.setId(userId);
+        expected.setFirstName(user.getFirstName());
+        expected.setLastName(user.getLastName());
+        expected.setUsername(user.getUsername());
+        expected.setEmail(user.getEmail());
+        expected.setPassword(user.getPassword());
+
         String oldFirstName = expected.getFirstName();
         String oldLastName = expected.getLastName();
         String oldUsername = expected.getUsername();
         String oldEmail = expected.getEmail();
-        String oldPassword = expected.getPassword();
+
+        final String oldPassword = expected.getPassword();
 
         expected.setPassword(newPassword);
 
-        User actual = userService.update(expected);
+        User actual = userService.update(expected, "2222");
 
         assertAll(
                 () -> assertEquals(oldFirstName, actual.getFirstName(),
@@ -128,8 +142,6 @@ public class UserServiceTests {
                         "After updating users field`s username must be the same."),
                 () -> assertEquals(oldEmail, actual.getEmail(),
                         "After updating users field`s email must be the same."),
-                () -> assertEquals(newPassword, actual.getPassword(),
-                        "After updating users field`s of new password must be the same."),
 
                 () -> assertNotEquals(oldPassword, actual.getPassword(),
                         "After updating users field`s old password must be different.")
@@ -138,12 +150,20 @@ public class UserServiceTests {
 
     @Test
     public void test_Invalid_Update() {
+        var user = userService.readById(2L);
         assertAll(
-                () -> assertThrows(IllegalArgumentException.class, () -> userService.update(null),
+                () -> assertThrows(IllegalArgumentException.class, () -> userService.update(null, "pass"),
                         "Here must be IllegalArgumentException because we cannot pass the null!"),
-                () -> assertThrows(EntityNotFoundException.class, () -> userService.update(new User()),
+
+                () -> assertThrows(EntityNotFoundException.class, () -> userService.update(new User(), "pass"),
                         "Here must be EntityNotFoundException because we cannot pass new User without initialize fields " +
-                                "and in this example we have an 0 id.")
+                                "and in this example we have an 0 id."),
+
+                () -> assertThrows(InvalidTextException.class, () -> userService.update(user, "  "),
+                        "Here must be InvalidTextException because we cannot pass the blank password!"),
+
+                () -> assertThrows(InvalidTextException.class, () -> userService.update(user, null),
+                        "Here must be InvalidTextException because we cannot pass the null password!")
         );
     }
 
