@@ -1,37 +1,31 @@
 package com.social.media.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "messages")
+@Document(collection = "messages")
 public class Message {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private String id;
 
     @NotBlank
     @Column(nullable = false)
     private String message;
 
     @NotNull
-    @CreationTimestamp
     private LocalDateTime timestamp;
 
-    @JsonBackReference
-    @JoinColumn(name = "messenger_id")
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Messenger messenger;
+    @NotNull
+    private long messengerId;
 
     public Message() {
         this.timestamp = LocalDateTime.now();
@@ -41,21 +35,23 @@ public class Message {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Message messageObj = (Message) o;
-        return id == messageObj.id && Objects.equals(message, messageObj.message) &&
-                Objects.equals(timestamp.toLocalDate(), messageObj.timestamp.toLocalDate()) && Objects.equals(messenger, messageObj.messenger);
+        Message message1 = (Message) o;
+        return messengerId == message1.messengerId && Objects.equals(id, message1.id) &&
+                Objects.equals(message, message1.message) && Objects.equals(timestamp.toLocalDate(), message1.timestamp.toLocalDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, message, messenger);
+        return Objects.hash(id, message, timestamp, messengerId);
     }
 
     @Override
     public String toString() {
         return "Message{" +
-                "id=" + id +
-                ", message='" + message +
+                "id='" + id + '\'' +
+                ", message='" + message + '\'' +
+                ", timestamp=" + timestamp +
+                ", messengerId=" + messengerId +
                 '}';
     }
 }

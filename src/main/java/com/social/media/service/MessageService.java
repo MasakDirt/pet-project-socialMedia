@@ -15,24 +15,24 @@ import java.util.Set;
 @AllArgsConstructor
 public class MessageService {
     private final MessageRepository messageRepository;
-    private final MessengerService messengerService;
 
     public Message create(long messengerId, String message) {
         checkValidMessage(message);
+        checkValidMessengerId(messengerId);
 
         var messageObj = new Message();
         messageObj.setMessage(message);
-        messageObj.setMessenger(messengerService.readById(messengerId));
+        messageObj.setMessengerId(messengerId);
 
         return messageRepository.save(messageObj);
     }
 
-    public Message readById(long id) {
+    public Message readById(String id) {
         return messageRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Message with id " + id + " not found!"));
     }
 
-    public Message update(long messageId, String updatedMessage) {
+    public Message update(String messageId, String updatedMessage) {
         checkValidMessage(updatedMessage);
 
         var oldMessage = readById(messageId);
@@ -41,7 +41,7 @@ public class MessageService {
         return messageRepository.save(oldMessage);
     }
 
-    public void delete(long id) {
+    public void delete(String id) {
         messageRepository.delete(readById(id));
     }
 
@@ -50,13 +50,19 @@ public class MessageService {
     }
 
     public List<Message> readAllByMessenger(long messengerId) {
-        var messenger = messengerService.readById(messengerId);
-        return messageRepository.findAllByMessenger(messenger);
+        checkValidMessengerId(messengerId);
+
+        return messageRepository.findAllByMessengerId(messengerId);
     }
 
     private void checkValidMessage(String message) throws InvalidTextException {
         if (message == null || message.trim().isEmpty()) {
             throw new InvalidTextException("The message must contain the text!");
+        }
+    }
+    private void checkValidMessengerId(long messengerId) throws EntityNotFoundException {
+        if (messengerId < 1) {
+            throw new EntityNotFoundException("Messenger with id " + messengerId + " not found!");
         }
     }
 }
