@@ -14,6 +14,8 @@ import java.util.Objects;
 @Setter
 @Document(collection = "messages")
 public class Message {
+    @Id
+    private String id;
 
     @NotBlank
     @Column(nullable = false)
@@ -33,20 +35,23 @@ public class Message {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Message messageObj = (Message) o;
-        return Objects.equals(message, messageObj.message) &&
-                Objects.equals(timestamp.toLocalDate(), messageObj.timestamp.toLocalDate()) && this.messengerId == messageObj.messengerId;
+        Message message1 = (Message) o;
+        return messengerId == message1.messengerId && Objects.equals(id, message1.id) &&
+                Objects.equals(message, message1.message) && Objects.equals(timestamp.toLocalDate(), message1.timestamp.toLocalDate());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(message, messengerId);
+        return Objects.hash(id, message, timestamp, messengerId);
     }
 
     @Override
     public String toString() {
         return "Message{" +
-                ", text='" + message +
+                "id='" + id + '\'' +
+                ", message='" + message + '\'' +
+                ", timestamp=" + timestamp +
+                ", messengerId=" + messengerId +
                 '}';
     }
 }
