@@ -8,6 +8,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 @EnableMongoRepositories
-public interface MessageRepository extends MongoRepository<Message, Long> {
+public interface MessageRepository extends MongoRepository<Message, String> {
     List<Message> findAllByMessengerId(@Param("messengerId") long messengerId);
 }
