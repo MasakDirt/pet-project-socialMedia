@@ -18,6 +18,9 @@ public class MessageService {
 
     public Message create(long messengerId, String message) {
         checkValidMessage(message);
+        if (messengerId < 1) {
+            throw new EntityNotFoundException("Messenger with id " + messengerId + " not found!");
+        }
 
         var messageObj = new Message();
         messageObj.setMessage(message);
