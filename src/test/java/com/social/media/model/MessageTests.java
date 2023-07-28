@@ -24,10 +24,9 @@ public class MessageTests {
     @BeforeAll
     public static void init() {
         validMessage = new Message();
-        validMessage.setId(1L);
         validMessage.setMessage("Hello!");
         validMessage.setTimestamp(LocalDateTime.now());
-        validMessage.setMessenger(new Messenger());
+        validMessage.setMessengerId(2L);
     }
 
     @Test
@@ -41,9 +40,8 @@ public class MessageTests {
     public void test_Invalid_MessageField(String message, String error) {
         Message invalid = new Message();
         invalid.setMessage(message);
-        invalid.setMessenger(new Messenger());
+        invalid.setMessengerId(4L);
         invalid.setTimestamp(LocalDateTime.now());
-        invalid.setId(1L);
 
         Set<ConstraintViolation<Message>> violations = getViolations(invalid);
 
@@ -55,9 +53,8 @@ public class MessageTests {
     public void test_Invalid_LocalDateTime() {
         Message invalid = new Message();
         invalid.setMessage("message");
-        invalid.setMessenger(new Messenger());
+        invalid.setMessengerId(5L);
         invalid.setTimestamp(null);
-        invalid.setId(1L);
 
         Set<ConstraintViolation<Message>> violations = getViolations(invalid);
         assertEquals(1, violations.size());
