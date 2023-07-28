@@ -2,7 +2,6 @@ package com.social.media.service;
 
 import com.social.media.exception.InvalidTextException;
 import com.social.media.model.entity.Message;
-import com.social.media.model.entity.Messenger;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
