@@ -1,6 +1,7 @@
 package com.social.media;
 
 import com.social.media.model.entity.*;
+import com.social.media.mongo.MongoClientConnection;
 import com.social.media.service.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,21 +27,24 @@ public class SocialMediaApplication implements CommandLineRunner {
     private final MessengerService messengerService;
     private final MessageService messageService;
 
+    private static final String CONNECTION_MONGO = System.getenv("connection");
+
     private static void writeInPropertiesFile() {
         String username = System.getenv("username");
         String password = System.getenv("password");
-        String propertiesFilePath = "src/main/resources/application.properties";
 
         if (username == null || password == null) {
             log.warn("You need to write your username and password in Environment Variables!");
             return;
         }
 
-        inputAndOutputInProperties(username, password, propertiesFilePath);
+        inputAndOutputInProperties(username, password);
     }
 
-    private static void inputAndOutputInProperties(String username, String password, String propertiesFilePath) {
+    private static void inputAndOutputInProperties(String username, String password) {
         Properties properties = new Properties();
+        String propertiesFilePath = "src/main/resources/application.properties";
+
         try {
             FileInputStream input = new FileInputStream(propertiesFilePath);
             properties.load(input);
@@ -49,6 +53,7 @@ public class SocialMediaApplication implements CommandLineRunner {
             properties.setProperty("spring.datasource.username", username);
             properties.setProperty("spring.datasource.password", password);
             properties.setProperty("spring.datasource.url", "jdbc:mysql://localhost:3306/my_social_media");
+            properties.setProperty("spring.data.mongodb.uri", CONNECTION_MONGO);
 
             FileOutputStream output = new FileOutputStream(propertiesFilePath);
             properties.store(output, null);
@@ -64,6 +69,8 @@ public class SocialMediaApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
         writeInPropertiesFile();
+        MongoClientConnection.connectToMongoDb(CONNECTION_MONGO);
+
         SpringApplication.run(SocialMediaApplication.class, args);
     }
 
@@ -187,7 +194,7 @@ public class SocialMediaApplication implements CommandLineRunner {
 
     private void createMessage(long messengerId, String message) {
         var created = messageService.create(messengerId, message);
-        log.info("Message for {} has been created", created.getMessenger());
+        log.info("Message for {} has been created", messengerService.readById(created.getMessengerId()));
     }
 }
 
