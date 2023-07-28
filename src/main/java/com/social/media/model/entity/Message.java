@@ -14,8 +14,6 @@ import java.util.Objects;
 @Setter
 @Document(collection = "messages")
 public class Message {
-    @Id
-    private long id;
 
     @NotBlank
     @Column(nullable = false)
@@ -36,20 +34,19 @@ public class Message {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Message messageObj = (Message) o;
-        return id == messageObj.id && Objects.equals(message, messageObj.message) &&
+        return Objects.equals(message, messageObj.message) &&
                 Objects.equals(timestamp.toLocalDate(), messageObj.timestamp.toLocalDate()) && this.messengerId == messageObj.messengerId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, message, messengerId);
+        return Objects.hash(message, messengerId);
     }
 
     @Override
     public String toString() {
         return "Message{" +
-                "id=" + id +
-                ", message='" + message +
+                ", text='" + message +
                 '}';
     }
 }
