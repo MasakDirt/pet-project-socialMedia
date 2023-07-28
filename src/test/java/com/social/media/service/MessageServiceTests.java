@@ -60,6 +60,7 @@ public class MessageServiceTests {
         expected.setMessengerId(messengerId);
 
         Message actual = messageService.create(messengerId, message);
+        expected.setId(actual.getId());
 
         assertEquals(expected, actual,
                 "Messages expected and actual must be equal!");
