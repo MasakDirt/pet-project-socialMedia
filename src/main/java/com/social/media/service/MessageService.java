@@ -15,14 +15,13 @@ import java.util.Set;
 @AllArgsConstructor
 public class MessageService {
     private final MessageRepository messageRepository;
-    private final MessengerService messengerService;
 
     public Message create(long messengerId, String message) {
         checkValidMessage(message);
 
         var messageObj = new Message();
         messageObj.setMessage(message);
-        messageObj.setMessenger(messengerService.readById(messengerId));
+        messageObj.setMessengerId(messengerId);
 
         return messageRepository.save(messageObj);
     }
@@ -50,8 +49,7 @@ public class MessageService {
     }
 
     public List<Message> readAllByMessenger(long messengerId) {
-        var messenger = messengerService.readById(messengerId);
-        return messageRepository.findAllByMessenger(messenger);
+        return messageRepository.findAllByMessengerId(messengerId);
     }
 
     private void checkValidMessage(String message) throws InvalidTextException {
