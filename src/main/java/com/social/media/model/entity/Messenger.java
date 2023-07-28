@@ -1,12 +1,10 @@
 package com.social.media.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -27,10 +25,6 @@ public class Messenger {
     @JoinColumn(name = "recipient_id")
     @ManyToOne(fetch = FetchType.EAGER)
     private User recipient;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "messenger", cascade = CascadeType.ALL)
-    private List<Message> messages;
 
     @Override
     public boolean equals(Object o) {
