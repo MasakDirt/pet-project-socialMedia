@@ -24,7 +24,7 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        // settings of cors and disable csrf(I have my token)!
+        // setting cors and disable csrf(I have my token)!
         httpSecurity
                 .cors(
                         cors -> cors.configurationSource(configurationSource)
@@ -38,7 +38,8 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(
                         authorizeHttpRequests -> authorizeHttpRequests
-                                .requestMatchers("/api/auth/login").permitAll()
+                                .requestMatchers("/api/auth/login/email").permitAll()
+                                .requestMatchers("/api/auth/login/username").permitAll()
                                 .requestMatchers("/api/auth/register").permitAll()
                                 .anyRequest()
                                 .authenticated()
