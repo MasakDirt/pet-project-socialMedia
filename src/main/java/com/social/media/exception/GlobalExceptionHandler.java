@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(HttpServletRequest request, ResponseStatusException ex) {
-        return getErrorResponse(request, (HttpStatus) ex.getStatusCode(), ex.getReason());
+        return getErrorResponse(request,  ex.getStatusCode(), ex.getReason());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -71,7 +72,7 @@ public class GlobalExceptionHandler {
         return getErrorResponse(request, HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
-    private ResponseEntity<ErrorResponse> getErrorResponse(HttpServletRequest request, HttpStatus httpStatus, String message) {
+    private ResponseEntity<ErrorResponse> getErrorResponse(HttpServletRequest request, HttpStatusCode httpStatus, String message) {
         log.error("Exception raised = {} :: URL = {}", message, request.getRequestURL());
         return ResponseEntity.status(httpStatus)
                 .body(new ErrorResponse(
