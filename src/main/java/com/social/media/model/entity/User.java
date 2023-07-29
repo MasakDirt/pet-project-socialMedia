@@ -21,14 +21,14 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
-    private static final String NAME_REGEXP = "[A-Z][a-z]+(-[A-Z][a-z]+){0,1}";
+    public static final String NAME_REGEXP = "[A-Z][a-z]+(-[A-Z][a-z]+){0,1}";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @NotNull
-    @Pattern(regexp = "^[a-z0-9-.]+$")
+    @Pattern(regexp = "^[a-z0-9-.]+$", message = "The 'username' must contains letters in lower case and can contain '-' or '.'")
     @Column(unique = true, nullable = false)
     private String username;
 
