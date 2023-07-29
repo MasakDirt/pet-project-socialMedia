@@ -163,9 +163,8 @@ public class SocialMediaApplication implements CommandLineRunner {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(password);
-        user.setRole(role);
 
-        var created = userService.create(user);
+        var created = userService.create(user, role);
         log.info("User {} successfully created", created.getName());
         return created.getId();
     }
