@@ -1,6 +1,7 @@
 package com.social.media.service;
 
 import com.social.media.exception.InvalidTextException;
+import com.social.media.model.entity.Role;
 import com.social.media.model.entity.User;
 import com.social.media.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,9 +21,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public User create(User user) {
+    public User create(User user, Role role) {
         if (user != null) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setRole(role);
             return userRepository.save(user);
         }
         throw new IllegalArgumentException("User cannot be blank!");
@@ -39,7 +41,7 @@ public class UserService {
         if (updatedUser != null) {
             var oldUser = readById(updatedUser.getId());
             if (passwordEncoder.matches(oldPassword, oldUser.getPassword())) {
-                return create(updatedUser);
+                return create(updatedUser, oldUser.getRole());
             }
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong old password");
         }
