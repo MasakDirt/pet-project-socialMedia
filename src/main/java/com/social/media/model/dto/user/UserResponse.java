@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
@@ -11,6 +12,7 @@ import static com.social.media.model.entity.User.*;
 
 @Data
 @Getter
+@Builder
 @AllArgsConstructor
 public class UserResponse {
     private long id;
@@ -34,4 +36,7 @@ public class UserResponse {
     @NotNull
     @Pattern(regexp = "[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}", message = "Must be a valid e-mail address")
     private String email;
+
+    @NotNull
+    private String role;
 }
