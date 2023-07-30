@@ -1,7 +1,9 @@
 package com.social.media.component;
 
+import com.social.media.model.entity.User;
 import com.social.media.service.UserService;
 import com.social.media.util.JwtUtils;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +29,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Override
     public void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response,
-                                    @NotNull FilterChain filterChain) throws ServletException, IOException {
+                                 @NotNull FilterChain filterChain) throws ServletException, IOException {
         if (hasAuthorizationBearer(request)) {
             String token = getAccessToken(request);
             if (jwtUtils.isJwtTokenValid(token)) {
@@ -48,15 +50,21 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     private void setAuthContext(String token, HttpServletRequest request) {
         UsernamePasswordAuthenticationToken authenticationToken =
-                getUsernamePasswordAuthenticationToken(token);
+                catchUsernamePasswordAuthenticationTokenExceptions(token);
 
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 
-    private UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(String token) {
-        var userDetails = userService.readByUsername(jwtUtils.getSubject(token));
+    private UsernamePasswordAuthenticationToken catchUsernamePasswordAuthenticationTokenExceptions(String token) {
+        try {
+            return getUsernamePasswordAuthenticationToken(userService.readByUsername(jwtUtils.getSubject(token)));
+        } catch (EntityNotFoundException exception) {
+            return getUsernamePasswordAuthenticationToken(userService.readByEmail(jwtUtils.getSubject(token)));
+        }
+    }
 
+    private UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(User userDetails) {
         return new UsernamePasswordAuthenticationToken(userDetails.getUsername(),
                 null, userDetails.getAuthorities());
     }
