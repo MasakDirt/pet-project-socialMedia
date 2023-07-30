@@ -63,7 +63,7 @@ public class UserService {
         checkValidString(email, "Email must contains at least one '@' and one '.' symbols");
 
         return userRepository.findByEmail(email).orElseThrow(() ->
-                new EntityNotFoundException("User with email " + email + "not found!"));
+                new EntityNotFoundException("User with email " + email + " not found!"));
     }
 
     public Set<User> getAll() {
@@ -80,6 +80,14 @@ public class UserService {
         checkValidString(lastName, "Last name must start with a capital letter and followed by one or more lowercase");
 
         return userRepository.findAllByLastName(lastName);
+    }
+
+    public User getUserByUsernameOrEmail(String currentUsernameEmail) {
+        checkValidString(currentUsernameEmail, "Username must contains letters in lower case and can contain '-' or '.' /" +
+                " Email must contains at least one '@' and one '.' symbols");
+
+        return userRepository.findByUsernameOrEmail(currentUsernameEmail, currentUsernameEmail)
+                .orElseThrow(() -> new EntityNotFoundException("User with username or email '" + currentUsernameEmail + "' not found!"));
     }
 
     private void checkValidString(String checking, String exception) {
