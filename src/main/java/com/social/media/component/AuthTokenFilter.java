@@ -55,7 +55,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 
     private UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(String token) {
-       var userDetails = userService.getUserBy_Username_Email(jwtUtils.getSubject(token));
+       var userDetails = userService.getUserByUsernameOrEmail(jwtUtils.getSubject(token));
 
         return new UsernamePasswordAuthenticationToken(userDetails.getUsername(),
                 null, userDetails.getAuthorities());
