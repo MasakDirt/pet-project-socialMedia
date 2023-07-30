@@ -45,7 +45,7 @@ public class SecurityConfig {
                                 .authenticated()
                 );
 
-        // added filter before and build it!
+        // added filter before and build SecurityFilterChain!
         return httpSecurity.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
