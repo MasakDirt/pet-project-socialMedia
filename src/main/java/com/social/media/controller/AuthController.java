@@ -3,7 +3,7 @@ package com.social.media.controller;
 import com.social.media.model.dto.auth.LoginRequestWithEmail;
 import com.social.media.model.dto.auth.LoginRequestWithUsername;
 import com.social.media.model.dto.user.UserCreateRequest;
-import com.social.media.model.dto.user.UserMapper;
+import com.social.media.model.mapper.UserMapper;
 import com.social.media.model.dto.user.UserResponse;
 import com.social.media.service.RoleService;
 import com.social.media.service.UserService;
