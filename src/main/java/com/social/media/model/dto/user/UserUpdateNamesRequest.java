@@ -14,13 +14,13 @@ import static com.social.media.model.entity.User.NAME_REGEXP;
 @AllArgsConstructor
 public class UserUpdateNamesRequest {
     @NotNull
-    @JsonProperty("last_name")
+    @JsonProperty("first_name")
     @Pattern(regexp = NAME_REGEXP,
             message = "First name must start with a capital letter and followed by one or more lowercase")
     private String firstName;
 
     @NotNull
-    @JsonProperty("first_name")
+    @JsonProperty("last_name")
     @Pattern(regexp = NAME_REGEXP,
             message = "Last name must start with a capital letter and followed by one or more lowercase")
     private String lastName;
