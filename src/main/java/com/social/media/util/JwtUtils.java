@@ -3,6 +3,7 @@ package com.social.media.util;
 import com.social.media.exception.InvalidTextException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -46,6 +47,8 @@ public class JwtUtils {
             log.error("JWT token is unsupported: {}", unsupportedJwtException.getMessage());
         } catch (IllegalArgumentException illegalArgumentException) {
             log.error("JWT claims string is empty: {}", illegalArgumentException.getMessage());
+        } catch (SignatureException signatureException) {
+            log.error("JWT signature does not match locally computed signature: {}", signatureException.getMessage());
         }
 
         return false;

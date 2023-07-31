@@ -86,9 +86,9 @@ public class SocialMediaApplication implements CommandLineRunner {
 
     private void creatingUsers(Role admin, Role userRole) {
 //      USERS
-        long adminId = createUser("Vito", "Jones", "skallet24", "jone@mail.co", "1111", admin);
+        long adminId = createUser("Garry", "Jones", "skallet24", "jone@mail.co", "1111", admin);
         long garryId = createUser("Garry", "Thomas", "garry.potter", "garry@mail.co", "2222", userRole);
-        long oliviaId = createUser("Olivia", "Rodriguez", "oil", "olivia@mail.co", "3333", userRole);
+        long oliviaId = createUser("Olivia", "Jones", "oil", "olivia@mail.co", "3333", userRole);
 
 //      POSTS
         long post1Id = createPost(adminId, "My first photo", List.of("photos/nature-photography.webp"));
@@ -163,9 +163,8 @@ public class SocialMediaApplication implements CommandLineRunner {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(password);
-        user.setRole(role);
 
-        var created = userService.create(user);
+        var created = userService.create(user, role);
         log.info("User {} successfully created", created.getName());
         return created.getId();
     }

@@ -27,7 +27,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
     @Override
     public void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response,
-                                    @NotNull FilterChain filterChain) throws ServletException, IOException {
+                                 @NotNull FilterChain filterChain) throws ServletException, IOException {
         if (hasAuthorizationBearer(request)) {
             String token = getAccessToken(request);
             if (jwtUtils.isJwtTokenValid(token)) {
@@ -55,7 +55,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 
     private UsernamePasswordAuthenticationToken getUsernamePasswordAuthenticationToken(String token) {
-        var userDetails = userService.readByUsername(jwtUtils.getSubject(token));
+       var userDetails = userService.getUserByUsernameOrEmail(jwtUtils.getSubject(token));
 
         return new UsernamePasswordAuthenticationToken(userDetails.getUsername(),
                 null, userDetails.getAuthorities());

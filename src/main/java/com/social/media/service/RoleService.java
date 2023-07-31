@@ -26,7 +26,7 @@ public class RoleService {
 
     public Role readById(long id) {
         return roleRepository.findById(id).orElseThrow(() ->
-                new EntityNotFoundException("Role with id" + id + "not found!"));
+                new EntityNotFoundException("Role with id " + id + " not found!"));
     }
 
     public Role update(long roleId, String updatedName) {
@@ -46,7 +46,7 @@ public class RoleService {
         checkValidName(name);
 
         return roleRepository.findByName(name).orElseThrow(() ->
-                new EntityNotFoundException("Role with name" + name + "not found!"));
+                new EntityNotFoundException("Role with name " + name + " not found!"));
     }
 
     public Set<Role> getAll() {
