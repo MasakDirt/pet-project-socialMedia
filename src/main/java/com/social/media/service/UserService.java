@@ -64,7 +64,7 @@ public class UserService {
         var user = getUserByUsernameOrEmail(currentUsernameOrEmail);
         user.setFirstName(firstName);
         user.setLastName(lastName);
-        return create(user, user.getRole());
+        return userRepository.save(user);
     }
 
     public User updatePasswordById(long id, String oldPassword, String newPassword) {
