@@ -67,6 +67,7 @@ public class RoleController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
     public RoleResponse createNew(@RequestParam(name = "name") String name, Authentication authentication) {
         var created = mapper.createRoleResponseFromEntity(roleService.create(name));
         log.info("=== POST-ROLE === admin - {}", authentication.getPrincipal());
