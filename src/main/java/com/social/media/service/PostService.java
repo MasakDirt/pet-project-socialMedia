@@ -14,10 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -72,7 +69,7 @@ public class PostService {
     }
 
     private List<Photo> getPhotos(List<String> filePaths, Post post) {
-        var photos = createNewPhotos(new ArrayList<>(), filePaths, post);
+        var photos = createNewPhotos(new LinkedList<>(), filePaths, post);
         makeBucketAndPutPhotoToMinIO(post.getOwner().getUsername(), filePaths);
 
         return photos;
