@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -70,14 +71,14 @@ public class PostService {
         return postRepository.findAllByOwnerId(ownerId);
     }
 
-    private Set<Photo> getPhotos(List<String> filePaths, Post post) {
-        var photos = createNewPhotos(new HashSet<>(), filePaths, post);
+    private List<Photo> getPhotos(List<String> filePaths, Post post) {
+        var photos = createNewPhotos(new ArrayList<>(), filePaths, post);
         makeBucketAndPutPhotoToMinIO(post.getOwner().getUsername(), filePaths);
 
         return photos;
     }
 
-    private Set<Photo> createNewPhotos(Set<Photo> photos, List<String> filePaths, Post post) {
+    private List<Photo> createNewPhotos(List<Photo> photos, List<String> filePaths, Post post) {
         filePaths.forEach(path -> {
             var photo = new Photo();
             photo.setPost(post);
