@@ -1,5 +1,6 @@
 package com.social.media.service;
 
+import com.social.media.model.entity.Like;
 import com.social.media.model.entity.Post;
 import com.social.media.model.entity.User;
 import lombok.AllArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 public class AuthorizationService {
     private final UserService userService;
     private final PostService postService;
+    private final LikeService likeService;
 
     public boolean isAuthAndUserAndUserRequestSame(long userId, long userRequestId, String currentUsername) {
         return userId == userRequestId && isAuthAndUserSame(userId, currentUsername);
@@ -28,7 +30,15 @@ public class AuthorizationService {
     }
 
     public boolean isAuthAndUserSameAndUserOwnerOfPostWithoutAdmin(long ownerId, long postId, String currentUsername) {
-        return getUser(currentUsername).getId() == ownerId && getPost(postId).getOwner().getId() == ownerId;
+        return getUser(currentUsername).getId() == ownerId && isUserOwnerOfPostWithoutAdmin(ownerId, postId);
+    }
+
+    public boolean isUserOwnerOfPostWithoutAdmin(long ownerId, long postId) {
+       return getPost(postId).getOwner().getId() == ownerId;
+    }
+
+    public boolean isUserOwnerOfPostAndPostContainLikeWithoutAdmin(long ownerId, long postId, long likeId) {
+       return isUserOwnerOfPostWithoutAdmin(ownerId, postId) && getLike(likeId).getPost().getId() == postId;
     }
 
     public boolean isAuthAndUserSame(long id, String currentUsername) {
@@ -53,5 +63,9 @@ public class AuthorizationService {
     }
     private Post getPost(long id) {
         return postService.readById(id);
+    }
+
+    private Like getLike(long likeId) {
+        return likeService.readById(likeId);
     }
 }
