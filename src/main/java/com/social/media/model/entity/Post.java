@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -48,6 +49,8 @@ public class Post {
 
     public Post() {
         this.timestamp = LocalDateTime.now();
+        comments = new HashSet<>();
+        likes = new HashSet<>();
     }
 
     @Override
