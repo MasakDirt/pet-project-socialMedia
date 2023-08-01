@@ -40,7 +40,7 @@ public class AuthorizationService {
     }
 
     public boolean isUsersSameAndOwnerOfPostAndPostContainLikeWithoutAdmin(long ownerId, long postId, long likeId,  String currentUsername) {
-       return isAuthAndUserSameWithoutAdmin(ownerId, currentUsername) && isUserOwnerOfPostWithoutAdmin(ownerId, postId) && getLike(likeId).getPost().getId() == postId;
+       return getUser(currentUsername).getId() == getLike(likeId).getOwner().getId() && isUserOwnerOfPostWithoutAdmin(ownerId, postId) && getLike(likeId).getPost().getId() == postId;
     }
 
     public boolean isUsersSameAndOwnerOfPostAndPostContainCommentWithoutAdmin(long ownerId, long postId, long commentId, String currentUsername) {

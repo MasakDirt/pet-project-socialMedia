@@ -56,17 +56,21 @@ public class LikeController {
         log.info("=== POST-USER-ID-POSTS-ID-LIKE === {} - {}", getRole(authentication), authentication.getPrincipal());
 
         return ResponseEntity.status(HttpStatus.SC_CREATED)
-                .body(String.format("Like successfully set for %s post.", created.getPost().getOwner().getName()));
+                .body(
+                        String.format("User %s like successfully set for %s post.", created.getOwner().getName(), created.getPost().getOwner().getName())
+                );
     }
 
     @DeleteMapping("users/{owner-id}/posts/{post-id}/likes/{id}")
-    @PreAuthorize("@authorizationService.isUserOwnerOfPostAndPostContainLikeWithoutAdmin(#ownerId, #postId, #id)")
+    @PreAuthorize("@authorizationService.isUsersSameAndOwnerOfPostAndPostContainLikeWithoutAdmin(#ownerId, #postId, #id, authentication.principal)")
     public ResponseEntity<String> removeLike(@PathVariable("owner-id") long ownerId, @PathVariable("post-id") long postId,
                                              @PathVariable long id, Authentication authentication) {
         var post = likeService.readById(id);
         likeService.delete(id);
         log.info("=== DELETE-USER-ID-POSTS-ID-LIKE === {} - {}", getRole(authentication), authentication.getPrincipal());
 
-        return ResponseEntity.ok(String.format("Like successfully removed for %s post.", post.getOwner().getName()));
+        return ResponseEntity.ok(
+                String.format("User %s like successfully removed for %s post.", post.getOwner().getName(), post.getPost().getOwner().getName())
+        );
     }
 }

@@ -13,7 +13,7 @@ public interface LikeMapper {
     LikeResponseForPosts createLikeResponseForPostsFromLike(Like like);
 
     @Mapping(target = "postId", expression = "java(like.getPost().getId())")
-    @Mapping(target = "description", expression = "java(like.getPost().getDescription())")
     @Mapping(target = "photos", expression = "java(like.getPost().getPhotos())")
+    @Mapping(target = "description", expression = "java(like.getPost().getDescription())")
     LikeResponseForOwner createLikeResponseForOwnerFromLike(Like like);
 }
