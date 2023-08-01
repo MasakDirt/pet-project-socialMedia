@@ -1,6 +1,6 @@
 package com.social.media.exception;
 
-import com.social.media.model.dto.ErrorResponse;
+import com.social.media.model.dto.error.ErrorResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.exception.ConstraintViolationException;
@@ -47,8 +47,8 @@ public class GlobalExceptionHandler {
         return getErrorResponse(request, HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(HttpServletRequest request, AccessDeniedException ex) {
+    @ExceptionHandler({AccessDeniedException.class, LikeAlreadyExistException.class})
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(HttpServletRequest request, RuntimeException ex) {
         return getErrorResponse(request, HttpStatus.FORBIDDEN, ex.getMessage());
     }
 
