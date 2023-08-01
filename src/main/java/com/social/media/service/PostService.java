@@ -43,6 +43,12 @@ public class PostService {
                 new EntityNotFoundException("Post with id " + id + " not found!"));
     }
 
+    public Post readByOwnerIdAndId(long ownerId , long id){
+        return postRepository.findByOwnerIdAndId(ownerId, id).orElseThrow(() ->
+                new EntityNotFoundException(String.format("User post with user id: %d, and post id: %d, not found", ownerId, id))
+        );
+    }
+
     public Post update(long postId, String updatedDescription) {
         checkDescriptionForNull(updatedDescription);
 
@@ -58,6 +64,10 @@ public class PostService {
 
     public Set<Post> getAll() {
         return new HashSet<>(postRepository.findAll());
+    }
+
+    public List<Post> getUserPosts(long ownerId) {
+        return postRepository.findAllByOwnerId(ownerId);
     }
 
     private Set<Photo> getPhotos(List<String> filePaths, Post post) {
