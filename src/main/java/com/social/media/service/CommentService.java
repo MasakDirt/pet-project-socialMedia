@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -23,6 +24,17 @@ public class CommentService {
         Comment commentObj = new Comment();
         commentObj.setComment(comment);
         commentObj.setOwner(userService.readById(ownerId));
+        commentObj.setPost(postService.readById(postId));
+
+        return commentRepository.save(commentObj);
+    }
+
+    public Comment create(String ownerUsername, long postId, String comment) {
+        checkValidComment(comment);
+
+        Comment commentObj = new Comment();
+        commentObj.setComment(comment);
+        commentObj.setOwner(userService.readByUsername(ownerUsername));
         commentObj.setPost(postService.readById(postId));
 
         return commentRepository.save(commentObj);
@@ -48,6 +60,14 @@ public class CommentService {
 
     public Set<Comment> getAll() {
         return new HashSet<>(commentRepository.findAll());
+    }
+
+    public List<Comment> getAllByPostId(long postId) {
+        return commentRepository.findAllByPostId(postId);
+    }
+
+    public List<Comment> getAllByOwnerId(long ownerId) {
+        return commentRepository.findAllByOwnerId(ownerId);
     }
 
     private void checkValidComment(String comment) throws InvalidTextException {
