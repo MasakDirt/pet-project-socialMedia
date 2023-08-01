@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.social.media.controller.ControllerHelper.getRole;
+
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -208,16 +210,5 @@ public class UserController {
         log.info("=== DELETE-USER-USERNAME-EMAIL === {} - {}", getRole(authentication), authentication.getPrincipal());
 
         return ResponseEntity.ok("User with name " + user.getName() + " successfully deleted!");
-    }
-
-    private String getRole(Authentication authentication) {
-        return authentication
-                .getAuthorities()
-                .stream()
-                .findFirst()
-                .get()
-                .getAuthority()
-                .substring(5)
-                .toLowerCase();
     }
 }
