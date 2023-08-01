@@ -1,5 +1,6 @@
 package com.social.media.service;
 
+import com.social.media.model.entity.Post;
 import com.social.media.model.entity.User;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AuthorizationService {
     private final UserService userService;
+    private final PostService postService;
 
     public boolean isAuthAndUserAndUserRequestSame(long userId, long userRequestId, String currentUsername) {
         return userId == userRequestId && isAuthAndUserSame(userId, currentUsername);
@@ -23,6 +25,10 @@ public class AuthorizationService {
 
     public boolean isAuthAndUserSameWithoutAdmin(long id, String currentUsername) {
         return getUser(currentUsername).getId() == id;
+    }
+
+    public boolean isAuthAndUserSameAndUserOwnerOfPostWithoutAdmin(long ownerId, long postId, String currentUsername) {
+        return getUser(currentUsername).getId() == ownerId && getPost(postId).getOwner().getId() == ownerId;
     }
 
     public boolean isAuthAndUserSame(long id, String currentUsername) {
@@ -44,5 +50,8 @@ public class AuthorizationService {
 
     private User getUser(String currentUsername) {
         return userService.readByUsername(currentUsername);
+    }
+    private Post getPost(long id) {
+        return postService.readById(id);
     }
 }
