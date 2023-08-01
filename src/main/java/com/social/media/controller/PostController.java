@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -72,6 +73,7 @@ public class PostController {
     }
 
     @PostMapping("/users/{owner-id}/posts")
+    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@authorizationService.isAuthAndUserSameWithoutAdmin(#ownerId, authentication.principal)")
     public PostResponse createPost(@PathVariable("owner-id") long ownerId,
                                    @RequestBody @Valid PostCreateRequest createRequest, Authentication authentication) {
