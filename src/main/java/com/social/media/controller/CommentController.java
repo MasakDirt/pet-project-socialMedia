@@ -38,7 +38,7 @@ public class CommentController {
     }
 
     @GetMapping("/users/{owner-id}/comments")
-    @PreAuthorize("@authorizationService.isAuthAndUserSame(#ownerId, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserSame(#ownerId, authentication.principal)")
     public List<CommentResponseForOwner> getAllUserComments(@PathVariable("owner-id") long ownerId, Authentication authentication) {
         var responses = commentService
                 .getAllByOwnerId(ownerId)
@@ -51,7 +51,7 @@ public class CommentController {
     }
 
     @PostMapping("/users/{owner-id}/posts/{post-id}/comments")
-    @PreAuthorize("@authorizationService.isUserOwnerOfPostWithoutAdmin(#ownerId, #postId)")
+    @PreAuthorize("@authPostService.isUserOwnerOfPostWithoutAdmin(#ownerId, #postId)")
     public ResponseEntity<String> postComment(@PathVariable("owner-id") long ownerId, @PathVariable("post-id") long postId,
                                               @NotBlank(message = "Comment cannot be blank!")
                                               @RequestParam String comment, Authentication authentication) {
@@ -65,7 +65,7 @@ public class CommentController {
     }
 
     @PutMapping("/users/{owner-id}/posts/{post-id}/comments/{id}")
-    @PreAuthorize("@authorizationService.isUsersSameAndOwnerOfPostAndPostContainCommentWithoutAdmin(#ownerId, #postId, #id, authentication.principal)")
+    @PreAuthorize("@authCommentService.isUsersSameAndOwnerOfPostAndPostContainCommentWithoutAdmin(#ownerId, #postId, #id, authentication.principal)")
     public ResponseEntity<String> updateComment(@PathVariable("owner-id") long ownerId, @PathVariable("post-id") long postId, @PathVariable long id,
                                                 @NotBlank(message = "Comment cannot be blank!")
                                                 @RequestParam("comment") String updatedComment, Authentication authentication) {
@@ -78,7 +78,7 @@ public class CommentController {
     }
 
     @DeleteMapping("/users/{owner-id}/posts/{post-id}/comments/{id}")
-    @PreAuthorize("@authorizationService.isUsersSameAndOwnerOfPostAndPostContainCommentWithoutAdmin(#ownerId, #postId, #id, authentication.principal)")
+    @PreAuthorize("@authCommentService.isUsersSameAndOwnerOfPostAndPostContainCommentWithoutAdmin(#ownerId, #postId, #id, authentication.principal)")
     public ResponseEntity<String> deleteComment(@PathVariable("owner-id") long ownerId, @PathVariable("post-id") long postId,
                                                 @PathVariable long id, Authentication authentication) {
         var comment = commentService.readById(id);
