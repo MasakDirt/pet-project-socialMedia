@@ -25,6 +25,7 @@ public class LikeController {
     private final LikeMapper mapper;
 
     @GetMapping("/posts/{post-id}/likes")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public List<LikeResponseForPosts> getAllLikesUnderPost(@PathVariable("post-id") long postId, Authentication authentication) {
         var responses = likeService.
                 getAllLikesUnderPost(postId)

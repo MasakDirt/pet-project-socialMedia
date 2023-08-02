@@ -26,6 +26,7 @@ public class CommentController {
     private final CommentMapper mapper;
 
     @GetMapping("/posts/{post-id}/comments")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public List<CommentResponseForPost> getAllCommentsUnderPost(@PathVariable("post-id") long postId, Authentication authentication) {
         var responses = commentService
                 .getAllByPostId(postId)
