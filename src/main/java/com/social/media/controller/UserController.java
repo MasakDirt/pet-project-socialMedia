@@ -77,7 +77,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("@authorizationService.isAuthAndUserSame(#id, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserSame(#id, authentication.principal)")
     public UserResponse getUserById(@PathVariable long id, Authentication authentication) {
         var user = mapper.createUserResponseFromUser(userService.readById(id));
         log.info("=== GET-USER-ID === {} - {}", getRole(authentication), authentication.getPrincipal());
@@ -86,7 +86,7 @@ public class UserController {
     }
 
     @GetMapping("/username-email/{username-or-email}")
-    @PreAuthorize("@authorizationService.isAuthAndUserSameByUsernameOrEmail(#usernameOrEmail, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserSameByUsernameOrEmail(#usernameOrEmail, authentication.principal)")
     public UserResponse getUserByUsername(@PathVariable("username-or-email") String usernameOrEmail, Authentication authentication) {
         var user = mapper.createUserResponseFromUser(userService.getUserByUsernameOrEmail(usernameOrEmail));
         log.info("=== GET-USER-USERNAME-EMAIL === {} - {}", getRole(authentication), authentication.getPrincipal());
@@ -123,7 +123,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("@authorizationService.isAuthAndUserAndUserRequestSame(#id, #requestWithId.id, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserAndUserRequestSame(#id, #requestWithId.id, authentication.principal)")
     public UserResponse updateFullUserById(@PathVariable long id, @RequestBody @Valid UserUpdateRequest requestWithId,
                                            Authentication authentication) {
         var updated = userService.update(mapper.createUserFromUserUpdateRequestById(requestWithId), requestWithId.getOldPassword());
@@ -133,7 +133,7 @@ public class UserController {
     }
 
     @PutMapping("/username/{username}")
-    @PreAuthorize("@authorizationService.isAuthAndUserAndUserRequestByUsernameSame(#username, #requestByUsername.username, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserAndUserRequestByUsernameSame(#username, #requestByUsername.username, authentication.principal)")
     public UserResponse updateFullUserByUsername(@PathVariable String username,
                                                  @RequestBody @Valid UserUpdateRequest requestByUsername, Authentication authentication) {
         var updated = userService.update(mapper.createUserFromUserUpdateRequestByUsername(requestByUsername), requestByUsername.getOldPassword());
@@ -143,7 +143,7 @@ public class UserController {
     }
 
     @PutMapping("/email/{email}")
-    @PreAuthorize("@authorizationService.isAuthAndUserAndUserRequestByEmailSame(#email, #requestByEmail.email, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserAndUserRequestByEmailSame(#email, #requestByEmail.email, authentication.principal)")
     public UserResponse updateFullUserByEmail(@PathVariable String email,
                                               @RequestBody @Valid UserUpdateRequest requestByEmail, Authentication authentication) {
         var updated = userService.update(mapper.createUserFromUserUpdateRequestByEmail(requestByEmail), requestByEmail.getOldPassword());
@@ -153,7 +153,7 @@ public class UserController {
     }
 
     @PutMapping("/name/{id}")
-    @PreAuthorize("@authorizationService.isAuthAndUserSame(#id, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserSame(#id, authentication.principal)")
     public UserResponse updateUserNamesById(@PathVariable long id, @RequestBody @Valid UserUpdateNamesRequest namesRequest,
                                             Authentication authentication) {
         var updated = mapper.createUserResponseFromUser(userService.updateNamesById(id, namesRequest.getFirstName(), namesRequest.getLastName()));
@@ -163,7 +163,7 @@ public class UserController {
     }
 
     @PutMapping("/name/username-email/{username-or-email}")
-    @PreAuthorize("@authorizationService.isAuthAndUserSameByUsernameOrEmail(#usernameOrEmail, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserSameByUsernameOrEmail(#usernameOrEmail, authentication.principal)")
     public UserResponse updateUserNamesByUsername(@PathVariable("username-or-email") String usernameOrEmail,
                                                   @RequestBody @Valid UserUpdateNamesRequest namesRequest, Authentication authentication) {
         var updated = mapper.createUserResponseFromUser(userService.updateNamesByUsernameOrEmail(usernameOrEmail, namesRequest.getFirstName(), namesRequest.getLastName()));
@@ -173,7 +173,7 @@ public class UserController {
     }
 
     @PutMapping("/password/{id}")
-    @PreAuthorize("@authorizationService.isAuthAndUserSameWithoutAdmin(#id, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserSameWithoutAdmin(#id, authentication.principal)")
     public ResponseEntity<String> updateUserPasswordById(@PathVariable long id, @RequestBody @Valid UserUpdatePasswordRequest passwordRequest,
                                                          Authentication authentication) {
         var user = userService.updatePasswordById(id, passwordRequest.getOldPassword(), passwordRequest.getNewPassword());
@@ -183,7 +183,7 @@ public class UserController {
     }
 
     @PutMapping("/password/username-email/{username-or-email}")
-    @PreAuthorize("@authorizationService.isUserSameByUsernameOrEmail(#usernameOrEmail, authentication.principal)")
+    @PreAuthorize("@authUserService.isUserSameByUsernameOrEmail(#usernameOrEmail, authentication.principal)")
     public ResponseEntity<String> updateUserPasswordByUsername(@PathVariable("username-or-email") String usernameOrEmail,
                                                                @RequestBody @Valid UserUpdatePasswordRequest passwordRequest, Authentication authentication) {
         var user = userService.updatePasswordByUsernameOrEmail(usernameOrEmail, passwordRequest.getOldPassword(), passwordRequest.getNewPassword());
@@ -193,7 +193,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("@authorizationService.isAuthAndUserSame(#id, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserSame(#id, authentication.principal)")
     public ResponseEntity<String> deleteUserById(@PathVariable long id, Authentication authentication) {
         var user = userService.readById(id);
         userService.delete(id);
@@ -203,7 +203,7 @@ public class UserController {
     }
 
     @DeleteMapping("/username-email/{username-or-email}")
-    @PreAuthorize("@authorizationService.isAuthAndUserSameByUsernameOrEmail(#usernameOrEmail, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserSameByUsernameOrEmail(#usernameOrEmail, authentication.principal)")
     public ResponseEntity<String> deleteUserByUsername(@PathVariable("username-or-email") String usernameOrEmail, Authentication authentication) {
         var user = userService.getUserByUsernameOrEmail(usernameOrEmail);
         userService.delete(usernameOrEmail);
