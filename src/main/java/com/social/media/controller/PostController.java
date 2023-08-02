@@ -74,7 +74,7 @@ public class PostController {
 
     @PostMapping("/users/{owner-id}/posts")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("@authorizationService.isAuthAndUserSameWithoutAdmin(#ownerId, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserSameWithoutAdmin(#ownerId, authentication.principal)")
     public PostResponse createPost(@PathVariable("owner-id") long ownerId,
                                    @RequestBody @Valid PostCreateRequest createRequest, Authentication authentication) {
         var created = mapper.createPostResponseFromPost(
@@ -86,7 +86,7 @@ public class PostController {
     }
 
     @PutMapping("/users/{owner-id}/posts/{id}")
-    @PreAuthorize("@authorizationService.isAuthAndUserSameAndUserOwnerOfPostWithoutAdmin(#ownerId, #id, authentication.principal)")
+    @PreAuthorize("@authPostService.isAuthAndUserSameAndUserOwnerOfPostWithoutAdmin(#ownerId, #id, authentication.principal)")
     public PostResponse updatePostDesc(@PathVariable("owner-id") long ownerId, @PathVariable long id,
                                        @RequestBody @NotEmpty @NotNull @Valid String description, Authentication authentication) {
         var updated = mapper.createPostResponseFromPost(
@@ -98,7 +98,7 @@ public class PostController {
     }
 
     @DeleteMapping("/users/{owner-id}/posts/{id}")
-    @PreAuthorize("@authorizationService.isAuthAndUserSameAndUserOwnerOfPostWithoutAdmin(#ownerId, #id, authentication.principal)")
+    @PreAuthorize("@authPostService.isAuthAndUserSameAndUserOwnerOfPostWithoutAdmin(#ownerId, #id, authentication.principal)")
     public ResponseEntity<String> deletePost(@PathVariable("owner-id") long ownerId, @PathVariable long id, Authentication authentication) {
         var post = postService.readById(id);
         postService.delete(id);
