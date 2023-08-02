@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.servlet.http.HttpServletRequest;
+
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(HttpServletRequest request, ResponseStatusException ex) {
-        return getErrorResponse(request,  ex.getStatusCode(), ex.getReason());
+        return getErrorResponse(request, ex.getStatusCode(), ex.getReason());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -37,7 +38,8 @@ public class GlobalExceptionHandler {
         return getErrorResponse(request, HttpStatus.BAD_REQUEST, message);
     }
 
-    @ExceptionHandler({ConstraintViolationException.class, SameUsersException.class, InvalidTextException.class})
+    @ExceptionHandler({ConstraintViolationException.class, SameUsersException.class,
+            InvalidTextException.class, LastPhotoException.class})
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(HttpServletRequest request, Exception ex) {
         return getErrorResponse(request, HttpStatus.BAD_REQUEST, ex.getMessage());
     }
