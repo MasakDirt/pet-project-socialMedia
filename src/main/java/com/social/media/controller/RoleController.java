@@ -55,7 +55,7 @@ public class RoleController {
     }
 
     @GetMapping("/user/{user-id}")
-    @PreAuthorize("@authorizationService.isAuthAndUserSame(#id, authentication.principal)")
+    @PreAuthorize("@authUserService.isAuthAndUserSame(#id, authentication.principal)")
     public RoleResponse getMyRole(@PathVariable("user-id") long id, Authentication authentication) {
         var userRole = userService.getUserByUsernameOrEmail(authentication.getName()).getRole();
 

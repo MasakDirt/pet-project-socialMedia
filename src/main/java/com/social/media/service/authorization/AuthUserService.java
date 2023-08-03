@@ -1,12 +1,13 @@
-package com.social.media.service;
+package com.social.media.service.authorization;
 
 import com.social.media.model.entity.User;
+import com.social.media.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class AuthorizationService {
+public class AuthUserService {
     private final UserService userService;
 
     public boolean isAuthAndUserAndUserRequestSame(long userId, long userRequestId, String currentUsername) {
@@ -19,10 +20,6 @@ public class AuthorizationService {
 
     public boolean isAuthAndUserAndUserRequestByEmailSame(String email, String requestEmail, String currentUsername) {
         return email.equals(requestEmail) && (isAdmin(currentUsername) || getUser(currentUsername).getEmail().equals(email));
-    }
-
-    public boolean isAuthAndUserSameWithoutAdmin(long id, String currentUsername) {
-        return getUser(currentUsername).getId() == id;
     }
 
     public boolean isAuthAndUserSame(long id, String currentUsername) {
@@ -38,11 +35,16 @@ public class AuthorizationService {
                 || getUser(currentUsername).getEmail().equals(usernameOrEmail);
     }
 
-    private boolean isAdmin(String currentUsername) {
+    public boolean isAuthAndUserSameWithoutAdmin(long id, String currentUsername) {
+        return getUser(currentUsername).getId() == id;
+    }
+
+    public User getUser(String currentUsername) {
+        return userService.readByUsername(currentUsername);
+    }
+
+    public boolean isAdmin(String currentUsername) {
         return getUser(currentUsername).getRole().getName().equals("ADMIN");
     }
 
-    private User getUser(String currentUsername) {
-        return userService.readByUsername(currentUsername);
-    }
 }

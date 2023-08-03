@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -62,10 +63,7 @@ public class MessengerService {
     }
 
     public Messenger readByOwnerAndRecipient(long ownerId, long recipientId) {
-        var owner = userService.readById(ownerId);
-        var recipient = userService.readById(recipientId);
-
-        return messengerRepository.findByOwnerAndRecipient(owner, recipient);
+        return messengerRepository.findByOwnerIdAndRecipientId(ownerId, recipientId);
     }
 
     public Set<Messenger> getAll() {
@@ -74,6 +72,10 @@ public class MessengerService {
 
     public void delete(long id) {
         messengerRepository.delete(readById(id));
+    }
+
+    public List<Messenger> getAllByOwnerId(long ownerId) {
+        return messengerRepository.findAllByOwnerId(ownerId);
     }
 
     private Messenger createNewMessengerId(long ownerId, long recipientId) {

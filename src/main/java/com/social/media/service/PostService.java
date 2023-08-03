@@ -14,9 +14,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -31,7 +29,7 @@ public class PostService {
 
         checkPathsForNull(filePaths);
 
-        var post = saveToDB(ownerId, description);
+        var post = savePostToDB(ownerId, description);
         var photos = getPhotos(filePaths, post);
         post.setPhotos(photos);
 
@@ -41,6 +39,12 @@ public class PostService {
     public Post readById(long id) {
         return postRepository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Post with id " + id + " not found!"));
+    }
+
+    public Post readByOwnerIdAndId(long ownerId , long id){
+        return postRepository.findByOwnerIdAndId(ownerId, id).orElseThrow(() ->
+                new EntityNotFoundException(String.format("User post with user id: %d, and post id: %d, not found", ownerId, id))
+        );
     }
 
     public Post update(long postId, String updatedDescription) {
@@ -60,14 +64,18 @@ public class PostService {
         return new HashSet<>(postRepository.findAll());
     }
 
-    private Set<Photo> getPhotos(List<String> filePaths, Post post) {
-        var photos = createNewPhotos(new HashSet<>(), filePaths, post);
+    public List<Post> getUserPosts(long ownerId) {
+        return postRepository.findAllByOwnerId(ownerId);
+    }
+
+    private List<Photo> getPhotos(List<String> filePaths, Post post) {
+        var photos = createNewPhotos(new LinkedList<>(), filePaths, post);
         makeBucketAndPutPhotoToMinIO(post.getOwner().getUsername(), filePaths);
 
         return photos;
     }
 
-    private Set<Photo> createNewPhotos(Set<Photo> photos, List<String> filePaths, Post post) {
+    private List<Photo> createNewPhotos(List<Photo> photos, List<String> filePaths, Post post) {
         filePaths.forEach(path -> {
             var photo = new Photo();
             photo.setPost(post);
@@ -77,7 +85,7 @@ public class PostService {
         return photos;
     }
 
-    private Post saveToDB(long ownerId, String description) {
+    private Post savePostToDB(long ownerId, String description) {
         var owner = userService.readById(ownerId);
 
         var post = new Post();
@@ -130,7 +138,7 @@ public class PostService {
 
         paths.forEach(path -> {
             if (path.trim().isEmpty()){
-                throw new InvalidTextException("You need to write valid photo path");
+                throw new InvalidTextException("You need to paste valid photo path");
             }
         });
     }

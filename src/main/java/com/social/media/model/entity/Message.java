@@ -27,6 +27,8 @@ public class Message {
     @NotNull
     private long messengerId;
 
+    private long ownerId;
+
     public Message() {
         this.timestamp = LocalDateTime.now();
     }
@@ -37,12 +39,14 @@ public class Message {
         if (o == null || getClass() != o.getClass()) return false;
         Message message1 = (Message) o;
         return messengerId == message1.messengerId && Objects.equals(id, message1.id) &&
-                Objects.equals(message, message1.message) && Objects.equals(timestamp.toLocalDate(), message1.timestamp.toLocalDate());
+                Objects.equals(message, message1.message) &&
+                Objects.equals(timestamp.toLocalDate(), message1.timestamp.toLocalDate())
+                && ownerId == message1.ownerId;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, message, timestamp, messengerId);
+        return Objects.hash(id, message, timestamp, messengerId, ownerId);
     }
 
     @Override
@@ -52,6 +56,7 @@ public class Message {
                 ", message='" + message + '\'' +
                 ", timestamp=" + timestamp +
                 ", messengerId=" + messengerId +
+                ", ownerId=" + ownerId +
                 '}';
     }
 }
