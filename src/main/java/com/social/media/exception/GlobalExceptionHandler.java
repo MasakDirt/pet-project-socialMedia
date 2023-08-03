@@ -55,12 +55,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({EntityNotFoundException.class, PhotoInBucketNotFound.class, PhotoDoesNotExist.class})
-    public ResponseEntity<ErrorResponse> handleNotFoundExceptions(HttpServletRequest request, Exception ex) {
+    public ResponseEntity<ErrorResponse> handleNotFoundExceptions(HttpServletRequest request, RuntimeException ex) {
         return getErrorResponse(request, HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler({PostCreationException.class, BucketCreationException.class})
-    public ResponseEntity<ErrorResponse> handleCreationException(HttpServletRequest request, Exception ex) {
+    @ExceptionHandler({PostCreationException.class, BucketCreationException.class, PhotoGettingException.class})
+    public ResponseEntity<ErrorResponse> handleCreationException(HttpServletRequest request, RuntimeException ex) {
         return getErrorResponse(request, HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
