@@ -29,7 +29,7 @@ public class PostService {
 
         checkPathsForNull(filePaths);
 
-        var post = saveToDB(ownerId, description);
+        var post = savePostToDB(ownerId, description);
         var photos = getPhotos(filePaths, post);
         post.setPhotos(photos);
 
@@ -85,7 +85,7 @@ public class PostService {
         return photos;
     }
 
-    private Post saveToDB(long ownerId, String description) {
+    private Post savePostToDB(long ownerId, String description) {
         var owner = userService.readById(ownerId);
 
         var post = new Post();
@@ -138,7 +138,7 @@ public class PostService {
 
         paths.forEach(path -> {
             if (path.trim().isEmpty()){
-                throw new InvalidTextException("You need to write valid photo path");
+                throw new InvalidTextException("You need to paste valid photo path");
             }
         });
     }
