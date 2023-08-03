@@ -3,7 +3,6 @@ package com.social.media.controller;
 import com.social.media.model.dto.MessageResponse;
 import com.social.media.model.mapper.MessageMapper;
 import com.social.media.service.MessageService;
-import jakarta.servlet.annotation.HttpConstraint;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
@@ -52,6 +51,7 @@ public class MessageController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@authMessengerService.isAuthAndUserSameAndUserOwnerOfMessengerWithoutAdmin(#ownerId, authentication.principal, #messengerId)")
     public List<MessageResponse> createMessage(@PathVariable("owner-id") long ownerId, @PathVariable("messenger-id") long messengerId,
                                                @RequestParam String message, Authentication authentication) {
@@ -67,7 +67,6 @@ public class MessageController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("@authMessageService.isAuthAndUserSameAndUserOwnerOfMessengerAndMessengerContainsMessageWithoutAdmin(#ownerId, authentication.principal, #messengerId, #id)")
     public List<MessageResponse> updateMessage(@PathVariable("owner-id") long ownerId, @PathVariable("messenger-id") long messengerId,
                                                @PathVariable String id, @NotEmpty @RequestParam("message") @Valid String updatedMessage,
