@@ -138,16 +138,16 @@ public class SocialMediaApplication implements CommandLineRunner {
         long adminWithOliviaMessengerId = messengerService.readByOwnerAndRecipient(adminId, oliviaId).getId();
 
 //      MESSAGES
-        createMessage(adminWithGarryMessengerId, "Hi, how are you?");
-        createMessage(garryWithAdminMessengerId, "Hi, I`m fine and you?");
-        createMessage(adminWithGarryMessengerId, "Nice, thanks.");
+        createMessage(adminWithGarryMessengerId, adminId, "Hi, how are you?");
+        createMessage(garryWithAdminMessengerId, garryId, "Hi, I`m fine and you?");
+        createMessage(adminWithGarryMessengerId, adminId, "Nice, thanks.");
 
-        createMessage(garryWithOliviaMessengerId, "Wow, I like that new Social Media, and you?");
-        createMessage(oliviaWithGarryMessengerId, "I like it, too)))");
+        createMessage(garryWithOliviaMessengerId, garryId, "Wow, I like that new Social Media, and you?");
+        createMessage(oliviaWithGarryMessengerId, oliviaId, "I like it, too)))");
 
-        createMessage(oliviaWithAdminMessengerId, "Today, I will go to the hospital, can you lift me?");
-        createMessage(adminWithOliviaMessengerId, "Of course, tell me what time please.");
-        createMessage(oliviaWithAdminMessengerId, "At 15.00");
+        createMessage(oliviaWithAdminMessengerId, oliviaId, "Today, I will go to the hospital, can you lift me?");
+        createMessage(adminWithOliviaMessengerId, adminId, "Of course, tell me what time please.");
+        createMessage(oliviaWithAdminMessengerId, oliviaId, "At 15.00");
     }
 
     private Role createRole(String name) {
@@ -191,8 +191,8 @@ public class SocialMediaApplication implements CommandLineRunner {
         return created.getId();
     }
 
-    private void createMessage(long messengerId, String message) {
-        var created = messageService.create(messengerId, message);
+    private void createMessage(long messengerId, long ownerId, String message) {
+        var created = messageService.create(messengerId, ownerId, message);
         log.info("Message for {} has been created", messengerService.readById(created.getMessengerId()));
     }
 }
