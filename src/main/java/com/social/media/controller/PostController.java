@@ -42,15 +42,8 @@ public class PostController {
         return responses;
     }
 
-    @GetMapping("/posts/{id}")
-    public PostResponse getPost(@PathVariable long id, Authentication authentication) {
-        var response = mapper.createPostResponseFromPost(postService.readById(id));
-        log.info("=== GET-POST-ID === {} - {}", getRole(authentication), authentication.getPrincipal());
-
-        return response;
-    }
-
     @GetMapping("/users/{owner-id}/posts")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public List<PostResponse> getAllUserPosts(@PathVariable("owner-id") long ownerId, Authentication authentication) {
         var responses = postService
                 .getUserPosts(ownerId)
@@ -63,6 +56,7 @@ public class PostController {
     }
 
     @GetMapping("/users/{owner-id}/posts/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public PostResponse getUserPost(@PathVariable("owner-id") long ownerId, @PathVariable long id, Authentication authentication) {
         var response = mapper.createPostResponseFromPost(
                 postService.readByOwnerIdAndId(ownerId, id)

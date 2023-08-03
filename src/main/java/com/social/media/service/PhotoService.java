@@ -3,7 +3,6 @@ package com.social.media.service;
 import com.social.media.exception.ConnectionToMinIOFailed;
 import com.social.media.exception.LastPhotoException;
 import com.social.media.exception.PhotoGettingException;
-import com.social.media.exception.PostCreationException;
 import com.social.media.minio.MinioClientImpl;
 import com.social.media.model.entity.Photo;
 import com.social.media.repository.PhotoRepository;
