@@ -8,6 +8,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface MessageMapper {
-    @Mapping(target = "ownerUsername", expression = "java(userService.readById(message.getOwnerId()).getUsername())")
-    MessageResponse createMessageResponseFromMessage(Message message, UserService userService);
+
+    MessageResponse createMessageResponseFromMessage(Message message);
 }

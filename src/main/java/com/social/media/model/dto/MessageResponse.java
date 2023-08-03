@@ -17,14 +17,12 @@ import java.time.LocalDateTime;
 public class MessageResponse {
     private String id;
 
+    @JsonProperty("owner_id")
+    private long ownerId;
+
     @NotBlank
     private String message;
 
     @NotNull
     private LocalDateTime timestamp;
-
-    @NotNull
-    @JsonProperty("owner_username")
-    @Pattern(regexp = "^[a-z0-9-.]+$", message = "The 'username' must contains letters in lower case and can contain '-' or '.'")
-    private String ownerUsername;
 }
