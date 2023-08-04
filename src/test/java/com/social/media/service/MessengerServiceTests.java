@@ -3,6 +3,7 @@ package com.social.media.service;
 import com.social.media.exception.InvalidTextException;
 import com.social.media.exception.SameUsersException;
 import com.social.media.model.entity.Messenger;
+import com.social.media.model.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
@@ -152,12 +154,8 @@ public class MessengerServiceTests {
 
     @Test
     public void test_Invalid_ReadByOwnerAndRecipient() {
-        assertAll(
-                () -> assertThrows(EntityNotFoundException.class, () -> messengerService.readByOwnerAndRecipient(1L, 0L),
-                        "Here must be EntityNotFoundException because we have not recipient(user) with id 0!"),
-                () -> assertThrows(EntityNotFoundException.class, () -> messengerService.readByOwnerAndRecipient(0L, 1L),
-                        "Here must be EntityNotFoundException because we have not owner(user) with id 0!")
-        );
+        assertThat(messengerService.readByOwnerAndRecipient(1L, 0L)).isNull();
+        assertThat(messengerService.readByOwnerAndRecipient(0L, 1L)).isNull();
     }
 
     @Test
@@ -172,5 +170,28 @@ public class MessengerServiceTests {
     public void test_Invalid_Delete() {
         assertThrows(EntityNotFoundException.class, () -> messengerService.delete(0L),
                 "Here must be EntityNotFoundException because we have not messenger with id 0!");
+    }
+
+    @Test
+    public void test_Valid_GetAllByOwnerId() {
+        long ownerId = 3L;
+        User owner = userService.readById(ownerId);
+
+        List<Messenger> actualMessengers = messengerService.getAllByOwnerId(ownerId);
+
+        assertAll(
+                () -> assertFalse(actualMessengers.isEmpty(),
+                        "User messengers list should contains one messenger!"),
+                () -> assertTrue(actualMessengers.size() < messengers.size(),
+                        "All messengers size must be bigger than user messengers."),
+                () -> assertEquals(actualMessengers.size(), owner.getMyMessengers().size(),
+                        "Messengers that user create must be the same messengers that reads by repository.")
+        );
+    }
+
+    @Test
+    public void test_Invalid__GetAllByOwnerId() {
+        assertTrue(messengerService.getAllByOwnerId(0L).isEmpty(),
+                "We have no user with id 0, so here must be empty list.");
     }
 }
