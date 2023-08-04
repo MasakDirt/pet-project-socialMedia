@@ -35,7 +35,8 @@ public class AuthEntryPointJwtTests {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized())
                 .andExpect(
                         result -> Assertions.assertEquals(
-                                "Unauthorized (Full authentication is required to access this resource)",
+                                "Error: Unauthorized (please authorize before going to this URL," +
+                                        " go to '/api/auth/login/(username or email)' and authorize there, than return!)",
                                 result.getResponse().getErrorMessage(),
                                 "Result must return a valid message about 'unauthorized' user."
                         )
