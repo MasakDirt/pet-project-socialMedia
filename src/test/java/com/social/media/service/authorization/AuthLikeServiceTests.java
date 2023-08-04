@@ -3,7 +3,6 @@ package com.social.media.service.authorization;
 import com.social.media.model.entity.Like;
 import com.social.media.service.LikeService;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
