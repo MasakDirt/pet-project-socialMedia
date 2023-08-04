@@ -126,7 +126,6 @@ public class SocialMediaApplication implements CommandLineRunner {
 
         createLike(adminId, post5Id);
         createLike(garryId, post5Id);
-        createLike(oliviaId, post5Id);
 
 //      MESSENGERS
         long adminWithGarryMessengerId = createMessenger(adminId, garryId);
