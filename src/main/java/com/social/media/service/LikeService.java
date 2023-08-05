@@ -59,7 +59,7 @@ public class LikeService {
     }
 
     public boolean isExistLike(@NotNull User owner, @NotNull Post post) {
-        Like like = readByOwnerAndPost(owner, post);
+        var like = readByOwnerAndPost(owner, post);
         return like != null;
     }
 

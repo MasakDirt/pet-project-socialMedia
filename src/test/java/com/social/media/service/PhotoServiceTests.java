@@ -1,6 +1,8 @@
 package com.social.media.service;
 
+import com.social.media.exception.LastPhotoException;
 import com.social.media.model.entity.Photo;
+import com.social.media.model.entity.Post;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
@@ -23,11 +26,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 public class PhotoServiceTests {
     private final PhotoService photoService;
+    private final PostService postService;
     private Set<Photo> photos;
 
     @Autowired
-    public PhotoServiceTests(PhotoService photoService) {
+    public PhotoServiceTests(PhotoService photoService, PostService postService) {
         this.photoService = photoService;
+        this.postService = postService;
     }
 
     @BeforeEach
@@ -38,6 +43,7 @@ public class PhotoServiceTests {
     @Test
     public void test_Injected_Components() {
         assertThat(photoService).isNotNull();
+        assertThat(postService).isNotNull();
         assertThat(photos).isNotNull();
     }
 
@@ -69,7 +75,8 @@ public class PhotoServiceTests {
     @Test
     public void test_Valid_ReadById() {
         Photo expected = new Photo();
-        expected.setFile(new File("photos/nature-photography.webp"));
+        expected.setFile(new File("photos/mcLaren.jpg"));
+        expected.setPost(postService.readById(3L));
         expected = photoService.create(expected);
 
         Photo actual = photoService.readById(expected.getId());
@@ -86,15 +93,38 @@ public class PhotoServiceTests {
 
     @Test
     public void test_Valid_Delete() {
-        photoService.delete(1L);
+        photoService.delete(2L, 2L);
 
         assertTrue(photos.size() > photoService.getAll().size(),
                 "After deleting photos service collection must be smaller than before deleting");
     }
 
     @Test
-    public void test_Invalid_Delete() {
-        assertThrows(EntityNotFoundException.class, () -> photoService.delete(0L),
+    public void test_Invalid_Delete_NotFound() {
+        assertThrows(EntityNotFoundException.class, () -> photoService.delete(2L, 0L),
                 "Here must be EntityNotFoundException because we have not photo with id 0!");
+    }
+
+    @Test
+    public void test_Invalid_Delete_LastPhoto() {
+        assertThrows(LastPhotoException.class, () -> photoService.delete(4L, 1L),
+                "Here must be LastPhotoException because we can not delete last photo from post, in post must be at least ine photo!");
+    }
+
+    @Test
+    public void test_Valid_GetAllByPost() {
+        long postId = 2L;
+        Post post = postService.readById(postId);
+
+        List<Photo> actualPhotos = photoService.getAllByPost(postId);
+
+        assertAll(
+                () -> assertFalse(actualPhotos.isEmpty(),
+                        "Post photos list should contains one post!"),
+                () -> assertTrue(actualPhotos.size() < photos.size(),
+                        "All photos size must be bigger than photos in the post."),
+                () -> assertEquals(actualPhotos.size(), post.getPhotos().size(),
+                        "Photos in the post must be the same with all photos which reads by post id.")
+        );
     }
 }

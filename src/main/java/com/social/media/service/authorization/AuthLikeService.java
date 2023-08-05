@@ -12,11 +12,12 @@ public class AuthLikeService {
     private final AuthUserService authUserService;
     private final AuthPostService authPostService;
 
-    public boolean isUsersSameAndOwnerOfPostAndPostContainLikeWithoutAdmin(long ownerId, long postId, long likeId,  String currentUsername) {
-        return authUserService.getUser(currentUsername).getId() == getLike(likeId).getOwner().getId() && authPostService.isUserOwnerOfPostWithoutAdmin(ownerId, postId) && getLike(likeId).getPost().getId() == postId;
+    public boolean isUsersSameAndOwnerOfPostAndPostContainLikeWithoutAdmin(long ownerId, long postId, long likeId, String currentUsername) {
+        return authUserService.getUser(currentUsername).getId() == getLike(likeId).getOwner().getId()
+                && authPostService.isUserOwnerOfPostWithoutAdmin(ownerId, postId) && getLike(likeId).getPost().getId() == postId;
     }
 
-    public  Like getLike(long likeId) {
+    public Like getLike(long likeId) {
         return likeService.readById(likeId);
     }
 }

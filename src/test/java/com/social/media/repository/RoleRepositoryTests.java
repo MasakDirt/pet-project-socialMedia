@@ -1,7 +1,6 @@
 package com.social.media.repository;
 
 import com.social.media.model.entity.Role;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest
@@ -30,7 +30,7 @@ public class RoleRepositoryTests {
     }
 
     @Test
-    public void test_FindByName() {
+    public void test_Valid_FindByName() {
         String name = "NAME";
         Role expected = new Role();
         expected.setName(name);
@@ -38,7 +38,13 @@ public class RoleRepositoryTests {
         expected = roleRepository.save(expected);
 
         Role actual = roleRepository.findByName(name).orElse(new Role());
-        Assertions.assertEquals(expected, actual,
+        assertEquals(expected, actual,
                 "Roles after reading by name must be equal!");
+    }
+
+    @Test
+    public void test_Invalid_FindByName() {
+        assertEquals(new Role(), roleRepository.findByName("").orElse(new Role()),
+                "We have no role with empty name, so here must be new Role object.");
     }
 }

@@ -77,7 +77,7 @@ public class PostServiceTests {
         Post expected = new Post();
         expected.setOwner(userService.readById(ownerId));
         expected.setDescription(description);
-        expected.setPhotos(Set.of(photo));
+        expected.setPhotos(List.of(photo));
         photo.setPost(expected);
 
         Post actual = postService.create(ownerId, description, List.of(file));
@@ -143,6 +143,28 @@ public class PostServiceTests {
     }
 
     @Test
+    public void test_Valid_ReadByOwnerIdAndId() {
+        User owner = userService.readById(3L);
+        Post expected = owner.getMyPosts().stream().findFirst().orElseThrow(EntityNotFoundException::new);
+
+        Post actual = postService.readByOwnerIdAndId(owner.getId(), expected.getId());
+
+        assertEquals(expected, actual,
+                "We find in user list of posts one post, and get it, than we read post by it`s id and posts objects must be sames!");
+    }
+
+    @Test
+    public void test_Invalid_ReadByOwnerIdAndId() {
+        assertAll(
+                () -> assertThrows(EntityNotFoundException.class, () -> postService.readByOwnerIdAndId(1L, 0L),
+                        "We have no post with id 0, so here must be EntityNotFoundException"),
+
+                () -> assertThrows(EntityNotFoundException.class, () -> postService.readByOwnerIdAndId(0L, 2L),
+                        "We have no user with id 0, so here must be EntityNotFoundException")
+        );
+    }
+
+    @Test
     public void test_Valid_Update() {
         long postId = 4L;
         String newDescription = "new description";
@@ -150,7 +172,7 @@ public class PostServiceTests {
         Post post = postService.readById(postId);
         long oldId = post.getId();
         String oldDescription = post.getDescription();
-        Set<Photo> oldPhotos = post.getPhotos();
+        List<Photo> oldPhotos = post.getPhotos();
         User oldOwner = post.getOwner();
         LocalDateTime oldTime = post.getTimestamp();
 
@@ -199,5 +221,28 @@ public class PostServiceTests {
     public void test_Invalid_Delete() {
         assertThrows(EntityNotFoundException.class, () -> postService.delete(0L),
                 "Here must be EntityNotFoundException because we have not post with id 0!");
+    }
+
+    @Test
+    public void test_Valid_GetUserPost() {
+        long ownerId = 3L;
+        User owner = userService.readById(ownerId);
+
+        List<Post> actualPosts = postService.getUserPosts(ownerId);
+
+        assertAll(
+                () -> assertFalse(actualPosts.isEmpty(),
+                        "Owner posts list should contains one post!"),
+                () -> assertTrue(actualPosts.size() < posts.size(),
+                        "All posts size must be bigger than user posts."),
+                () -> assertEquals(actualPosts.size(), owner.getMyPosts().size(),
+                        "User posts must be the same with all posts which reads by owner id.")
+        );
+    }
+
+    @Test
+    public void test_Invalid_GetUserPost() {
+        assertTrue(postService.getUserPosts(0L).isEmpty(),
+                "We have no user with id 0, so here must be empty list.");
     }
 }

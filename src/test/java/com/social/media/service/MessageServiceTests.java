@@ -1,7 +1,10 @@
 package com.social.media.service;
 
+import com.google.common.collect.Iterables;
 import com.social.media.exception.InvalidTextException;
 import com.social.media.model.entity.Message;
+import com.social.media.model.entity.Messenger;
+import com.social.media.model.entity.User;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,8 +16,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,12 +31,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 public class MessageServiceTests {
     private final MessageService messageService;
+    private final MessengerService messengerService;
+    private final UserService userService;
+    private final RoleService roleService;
 
     private Set<Message> messages;
 
     @Autowired
-    public MessageServiceTests(MessageService messageService) {
+    public MessageServiceTests(MessageService messageService, MessengerService messengerService, UserService userService, RoleService roleService) {
         this.messageService = messageService;
+        this.messengerService = messengerService;
+        this.userService = userService;
+        this.roleService = roleService;
     }
 
     @BeforeEach
@@ -42,6 +53,9 @@ public class MessageServiceTests {
     @Test
     public void test_Injected_Component() {
         assertThat(messageService).isNotNull();
+        assertThat(messengerService).isNotNull();
+        assertThat(userService).isNotNull();
+        assertThat(roleService).isNotNull();
     }
 
     @Test
@@ -54,12 +68,14 @@ public class MessageServiceTests {
     public void test_Valid_Create() {
         String message = "new message";
         long messengerId = 3L;
+        long ownerId = 2L;
 
         Message expected = new Message();
         expected.setMessage(message);
         expected.setMessengerId(messengerId);
+        expected.setOwnerId(ownerId);
 
-        Message actual = messageService.create(messengerId, message);
+        Message actual = messageService.create(messengerId, ownerId, message);
         expected.setId(actual.getId());
 
         assertEquals(expected, actual,
@@ -69,19 +85,20 @@ public class MessageServiceTests {
     @Test
     public void test_Invalid_Create() {
         long messengerId = 2L;
+        long ownerId = 1L;
         assertAll(
-                () -> assertThrows(EntityNotFoundException.class, () -> messageService.create(0, "message"),
+                () -> assertThrows(EntityNotFoundException.class, () -> messageService.create(0, ownerId, "message"),
                         "Here must be EntityNotFoundException because we have not messenger with id 0!"),
-                () -> assertThrows(InvalidTextException.class, () -> messageService.create(messengerId, ""),
+                () -> assertThrows(InvalidTextException.class, () -> messageService.create(messengerId, ownerId, ""),
                         "Here must be InvalidTextException because message cannot be 'blank'!"),
-                () -> assertThrows(InvalidTextException.class, () -> messageService.create(messengerId, null),
+                () -> assertThrows(InvalidTextException.class, () -> messageService.create(messengerId, ownerId, null),
                         "Here must be InvalidTextException because message cannot be 'null'!")
         );
     }
 
     @Test
     public void test_Valid_ReadById() {
-        Message expected = messageService.create(4L, "expected");
+        Message expected = messageService.create(4L, 3L, "expected");
         Message actual = messageService.readById(expected.getId());
 
         assertEquals(expected, actual,
@@ -97,8 +114,9 @@ public class MessageServiceTests {
     @Test
     public void test_Valid_Update() {
         long messengerId = 2L;
+        long ownerId = 2L;
 
-        Message old = messageService.create(messengerId, "message");
+        Message old = messageService.create(messengerId, ownerId, "message");
         String oldId = old.getId();
         String oldMessage = old.getMessage();
         LocalDateTime oldTimestamp = old.getTimestamp();
@@ -122,7 +140,7 @@ public class MessageServiceTests {
 
     @Test
     public void test_Invalid_Update() {
-        Message message = messageService.create(4L, "message");
+        Message message = messageService.create(4L, 2L, "message");
         String messageId = message.getId();
 
         assertAll(
@@ -137,7 +155,7 @@ public class MessageServiceTests {
 
     @Test
     public void test_Valid_Delete() {
-        Message message = messageService.create(1L, "message");
+        Message message = messageService.create(1L, 3L, "message");
         String messageId = message.getId();
 
         messageService.delete(messageId);
@@ -160,8 +178,8 @@ public class MessageServiceTests {
 
         assertTrue(actual.size() > 0);
         assertTrue(actual.stream()
-                .anyMatch(message -> message.getMessengerId() == messengerId),
-                "This assert must be true, if all messages which read by messenger id has sames messengerIds.");
+                        .anyMatch(message -> message.getMessengerId() == messengerId),
+                "This assert must be true, if all messages which read by messenger id has sames messenger Id`s.");
 
     }
 
@@ -169,5 +187,65 @@ public class MessageServiceTests {
     public void test_Invalid_ReadAllByMessenger() {
         assertThrows(EntityNotFoundException.class, () -> messageService.readAllByMessenger(0L),
                 "Here must be EntityNotFoundException because we have not messenger with id 0!");
+    }
+
+    @Test
+    public void test_Valid_GetAllByMessenger() {
+        long messengerId = 3L;
+
+        Messenger ownersMessenger = messengerService.readById(messengerId);
+        Messenger recipientMessenger = messengerService.readByOwnerAndRecipient(ownersMessenger.getRecipient().getId(), ownersMessenger.getOwner().getId());
+
+        Stream<Message> ownersMessages = messageService.readAllByMessenger(messengerId).stream();
+        Stream<Message> recipientMessages = messageService.readAllByMessenger(recipientMessenger.getId()).stream();
+
+        List<Message> expectedMessages = Stream.concat(ownersMessages, recipientMessages)
+                .sorted(Comparator.comparing(Message::getTimestamp)).toList();
+
+        List<Message> actualMessages = messageService.getAllByMessenger(messengerId);
+
+        assertEquals(expectedMessages, actualMessages,
+                "Expected messages that created by me must be equal to read.");
+    }
+
+    @Test
+    public void test_Invalid_GetAllByMessenger() {
+        assertThrows(EntityNotFoundException.class, () -> messageService.getAllByMessenger(0L),
+                "We have no messenger with id 0, so here must be exception!");
+    }
+
+    @Test
+    public void test_Valid_GetLastMessage() {
+        long messengerId = 4L;
+        List<Message> messagesRead = messageService.getAllByMessenger(messengerId);
+        String expected = Iterables.getLast(messagesRead).getMessage();
+
+        String actual = messageService.getLastMessage(messengerId);
+        assertEquals(expected, actual,
+                "Strings of last message should be the same.");
+    }
+
+    @Test
+    public void test_Valid_GetLastMessage_Empty() {
+        User create = new User();
+        create.setFirstName("First");
+        create.setLastName("Last");
+        create.setPassword("pass123");
+        create.setEmail("email@mail.co");
+        create.setUsername("username");
+        User user = userService.create(create, roleService.readByName("ADMIN"));
+
+        Messenger messenger = messengerService.create(user.getId(), 2L);
+
+        String actual = messageService.getLastMessage(messenger.getId());
+
+        assertEquals("", actual,
+                "We have no messages in created messenger, so here must be empty last message string!");
+    }
+
+    @Test
+    public void test_Invalid_GetLastMessage() {
+        assertThrows(EntityNotFoundException.class, () -> messageService.getLastMessage(0L),
+                "EntityNotFoundException was thrown because we have no messenger with id 0!");
     }
 }

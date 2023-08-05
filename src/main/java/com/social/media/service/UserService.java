@@ -54,6 +54,9 @@ public class UserService {
     }
 
     public User updateNamesById(long id, String firstName, String lastName) {
+        checkValidString(firstName, "First name must start with a capital letter and followed by one or more lowercase");
+        checkValidString(lastName, "Last name must start with a capital letter and followed by one or more lowercase");
+
         var user = readById(id);
         user.setFirstName(firstName);
         user.setLastName(lastName);
@@ -61,6 +64,9 @@ public class UserService {
     }
 
     public User updateNamesByUsernameOrEmail(String currentUsernameOrEmail, String firstName, String lastName) {
+        checkValidString(firstName, "First name must start with a capital letter and followed by one or more lowercase");
+        checkValidString(lastName, "Last name must start with a capital letter and followed by one or more lowercase");
+
         var user = getUserByUsernameOrEmail(currentUsernameOrEmail);
         user.setFirstName(firstName);
         user.setLastName(lastName);
@@ -68,15 +74,20 @@ public class UserService {
     }
 
     public User updatePasswordById(long id, String oldPassword, String newPassword) {
+        checkValidString(oldPassword, "The 'password' cannot be blank!");
+        checkValidString(newPassword, "The 'password' cannot be blank!");
         var oldUser = readById(id);
 
         return userForUpdatePasswords(oldUser, oldPassword, newPassword);
     }
 
     public User updatePasswordByUsernameOrEmail(String currentUsernameOrEmail, String oldPassword, String newPassword) {
+        checkValidString(oldPassword, "The 'password' cannot be blank!");
+        checkValidString(newPassword, "The 'password' cannot be blank!");
+
         var oldUser = getUserByUsernameOrEmail(currentUsernameOrEmail);
 
-       return userForUpdatePasswords(oldUser, oldPassword, newPassword);
+        return userForUpdatePasswords(oldUser, oldPassword, newPassword);
     }
 
     public void delete(long id) {

@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -53,10 +54,12 @@ public class CommentServiceTests {
     public void test_GetAll() {
         assertTrue(0 < commentService.getAll().size(),
                 "This condition must be true, because we have much bigger comments than 0.");
+        assertEquals(comments, commentService.getAll(),
+                "This condition must be true.");
     }
 
     @Test
-    public void test_Valid_Create() {
+    public void test_Valid_Create_ByOwnerId() {
         long ownerId = 1L;
         long postId = 4L;
         String comment = "Comment";
@@ -76,7 +79,7 @@ public class CommentServiceTests {
     }
 
     @Test
-    public void test_Invalid_Create() {
+    public void test_Invalid_Create_ByOwnerId() {
         long ownerId = 2L;
         long postId = 4L;
         String comment = "Comment";
@@ -92,6 +95,47 @@ public class CommentServiceTests {
                         "Here must be InvalidTextException because we cannot transmit 'null' in parameter comment in method create!"),
 
                 () -> assertThrows(InvalidTextException.class, () -> commentService.create(ownerId, postId, ""),
+                        "Here must be InvalidTextException because we cannot transmit blank comment in it`s parameter in method create!")
+        );
+    }
+
+    @Test
+    public void test_Valid_Create_ByOwnerUsername() {
+        String ownerUsername = "oil";
+        long postId = 4L;
+        String comment = "Comment";
+
+        Comment expected = new Comment();
+        expected.setComment(comment);
+        expected.setPost(postService.readById(postId));
+        expected.setOwner(userService.readByUsername(ownerUsername));
+
+        Comment actual = commentService.create(ownerUsername, postId, comment);
+        expected.setId(actual.getId());
+
+        assertTrue(comments.size() < commentService.getAll().size(),
+                "After creating new comment commentService.getAll size must be bigger than comments size before");
+        assertEquals(expected, actual,
+                "Expected and actual comments must be equal, because we create it with common objects");
+    }
+
+    @Test
+    public void test_Invalid_Create_ByOwnerUsername() {
+        String ownerUsername = "garry.potter";
+        long postId = 4L;
+        String comment = "Comment";
+
+        assertAll(
+                () -> assertThrows(EntityNotFoundException.class, () -> commentService.create("invalid.username", postId, comment),
+                        "Here must be EntityNotFoundException because we have not in db user with this username"),
+
+                () -> assertThrows(EntityNotFoundException.class, () -> commentService.create(ownerUsername, 100000L, comment),
+                        "Here must be EntityNotFoundException because we have not in db post with id 100000"),
+
+                () -> assertThrows(InvalidTextException.class, () -> commentService.create(ownerUsername, postId, null),
+                        "Here must be InvalidTextException because we cannot transmit 'null' in parameter comment in method create!"),
+
+                () -> assertThrows(InvalidTextException.class, () -> commentService.create(ownerUsername, postId, ""),
                         "Here must be InvalidTextException because we cannot transmit blank comment in it`s parameter in method create!")
         );
     }
@@ -164,5 +208,51 @@ public class CommentServiceTests {
     public void test_Invalid_Delete() {
         assertThrows(EntityNotFoundException.class, () -> commentService.delete(0),
                 "Here must be EntityNotFoundException because we have not comment with id 0.");
+    }
+
+    @Test
+    public void test_Valid_GetAllByPostId() {
+        long postId = 4L;
+        Post post = postService.readById(postId);
+
+        List<Comment> actualComments = commentService.getAllByPostId(postId);
+
+        assertAll(
+                () -> assertTrue(actualComments.size() > 0,
+                        "Comments under the post must be bigger than 0."),
+                () -> assertTrue(actualComments.size() < comments.size(),
+                        "All comments must be bigger than comments under the post!"),
+                () -> assertEquals(post.getComments().size(), actualComments.size(),
+                        "Post comments and service comments reading under the post must be equal.")
+        );
+    }
+
+    @Test
+    public void test_Invalid_GetAllByPostId() {
+        assertTrue(commentService.getAllByPostId(0L).isEmpty(),
+                "When we reading not existing post, here must be empty list");
+    }
+
+    @Test
+    public void test_Valid_GetAllByOwnerId() {
+        long ownerId = 1L;
+        User owner = userService.readById(ownerId);
+
+        List<Comment> actualComments = commentService.getAllByOwnerId(ownerId);
+
+        assertAll(
+                () -> assertFalse(actualComments.isEmpty(),
+                        "Comments under the post should not be empty!"),
+                () -> assertTrue(actualComments.size() < comments.size(),
+                        "All comments must be bigger than user comments!"),
+                () -> assertEquals(owner.getMyComments().size(), actualComments.size(),
+                        "User comments and service comments reading must be equal.")
+        );
+    }
+
+    @Test
+    public void test_Invalid_GetAllByOwnerId() {
+        assertTrue(commentService.getAllByOwnerId(0L).isEmpty(),
+                "When we reading not existing user, here must be empty list");
     }
 }

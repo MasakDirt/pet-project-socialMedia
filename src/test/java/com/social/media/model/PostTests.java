@@ -11,7 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import static com.social.media.model.ValidatorHelperForTests.getViolations;
@@ -26,7 +27,7 @@ public class PostTests {
         photo.setFile(new File("photos/nature-photography.webp"));
 
         validPost = new Post();
-        validPost.setPhotos(Set.of(photo));
+        validPost.setPhotos(List.of(photo));
         validPost.setTimestamp(LocalDateTime.now());
         validPost.setOwner(new User());
         validPost.setDescription("Description");
@@ -43,7 +44,7 @@ public class PostTests {
     @Test
     public void test_Invalid_Timestamp() {
         Post invalid = new Post();
-        invalid.setPhotos(new HashSet<>());
+        invalid.setPhotos(new LinkedList<>());
         invalid.setDescription("");
         invalid.setTimestamp(null);
 
@@ -54,7 +55,7 @@ public class PostTests {
     @Test
     public void test_Invalid_Description() {
         Post invalid = new Post();
-        invalid.setPhotos(new HashSet<>());
+        invalid.setPhotos(new LinkedList<>());
         invalid.setDescription(null);
         invalid.setTimestamp(LocalDateTime.now());
 
