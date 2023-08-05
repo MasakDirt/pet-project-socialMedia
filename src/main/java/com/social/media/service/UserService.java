@@ -116,8 +116,8 @@ public class UserService {
                 new EntityNotFoundException("User with email " + email + " not found!"));
     }
 
-    public Set<User> getAll() {
-        return new HashSet<>(userRepository.findAll());
+    public List<User> getAll() {
+        return userRepository.findAll();
     }
 
     public List<User> getAllByFirstName(String firstName) {
