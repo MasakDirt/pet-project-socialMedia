@@ -8,7 +8,6 @@ import com.social.media.model.entity.User;
 import com.social.media.model.mapper.UserMapper;
 import com.social.media.service.RoleService;
 import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
