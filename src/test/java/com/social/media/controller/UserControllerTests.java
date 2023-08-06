@@ -479,6 +479,30 @@ public class UserControllerTests {
     }
 
     @Test
+    public void test_Invalid_UpdateFullUserById_WrongPassword() throws Exception {
+        long validUserId = 1L;
+        String password = "2222";
+
+        mvc.perform(put(BASE_URL + "/{id}", validUserId)
+                        .header("Authorization", "Bearer " + tokenAdmin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                asJsonString(
+                                        new UserUpdateRequest(validUserId,
+                                                "username", "newemail@mail.co", "Sergio",
+                                                "Last", password, "098765432110")
+                                )
+                        )
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(result ->
+                        assertThat(result.getResponse().getContentAsString()).isNotNull().isNotEmpty().contains("Wrong old password")
+                );
+
+        assertFalse(passwordEncoder.matches(password, userService.readById(validUserId).getPassword()));
+    }
+
+    @Test
     public void test_Valid_UpdateFullUserByUsername_AdminAuthorization() throws Exception {
         String username = "oil";
 
@@ -582,6 +606,30 @@ public class UserControllerTests {
     }
 
     @Test
+    public void test_Invalid_UpdateFullUserByUsername_WrongPassword() throws Exception {
+        String username = "skallet24";
+        String password = "2222";
+
+        mvc.perform(put(BASE_URL + "/username/{username}", username)
+                        .header("Authorization", "Bearer " + tokenAdmin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                asJsonString(
+                                        new UserUpdateRequest(1L,
+                                                username, "newemail@mail.co", "Sergio",
+                                                "Last", password, "098765432110")
+                                )
+                        )
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(result ->
+                        assertThat(result.getResponse().getContentAsString()).isNotNull().isNotEmpty().contains("Wrong old password")
+                );
+
+        assertFalse(passwordEncoder.matches(password, userService.readByUsername(username).getPassword()));
+    }
+
+    @Test
     public void test_Valid_UpdateFullUserByEmail_AdminAuthorization() throws Exception {
         String email = "olivia@mail.co";
         UserResponse unexpected = mapper.createUserResponseFromUser(userService.readByEmail(email));
@@ -679,6 +727,31 @@ public class UserControllerTests {
                 );
 
         assertTrue(passwordEncoder.matches(password, userService.readByEmail(validEmail).getPassword()));
+    }
+
+    @Test
+    public void test_Invalid_UpdateFullUserByEmail_WrongPassword() throws Exception {
+        String email = "jone@mail.co";
+        String password = "2222";
+        User user = userService.readByEmail(email);
+
+        mvc.perform(put(BASE_URL + "/email/{email}", email)
+                        .header("Authorization", "Bearer " + tokenAdmin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                asJsonString(
+                                        new UserUpdateRequest(user.getId(),
+                                                "username", email, "Sergio",
+                                                "Last", password, "098765432110")
+                                )
+                        )
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(result ->
+                        assertThat(result.getResponse().getContentAsString()).isNotNull().isNotEmpty().contains("Wrong old password")
+                );
+
+        assertFalse(passwordEncoder.matches(password, user.getPassword()));
     }
 
     @Test
@@ -901,6 +974,28 @@ public class UserControllerTests {
         assertTrue(passwordEncoder.matches(oldPass, userService.readById(userId).getPassword()));
     }
 
+    @Test
+    public void test_Invalid_UpdateUserPasswordById_WrongPassword() throws Exception {
+        long userID = 1L;
+        String password = "2222";
+
+        mvc.perform(put(BASE_URL + "/password/{id}", userID)
+                        .header("Authorization", "Bearer " + tokenAdmin)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                asJsonString(
+                                       new UserUpdatePasswordRequest(password, "newpass")
+                                )
+                        )
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(result ->
+                        assertThat(result.getResponse().getContentAsString()).isNotNull().isNotEmpty().contains("Wrong old password")
+                );
+
+        assertFalse(passwordEncoder.matches(password, userService.readById(userID).getPassword()));
+    }
+
     @ParameterizedTest
     @MethodSource("argumentsOfGarryUsernameAndEmail")
     public void test_Valid_UpdateUserPasswordByUsername_UserAuthorization(String usernameOrEmail) throws Exception {
@@ -941,6 +1036,28 @@ public class UserControllerTests {
                 );
 
         assertTrue(passwordEncoder.matches(oldPass, userService.getUserByUsernameOrEmail(usernameOrEmail).getPassword()));
+    }
+
+    @ParameterizedTest
+    @MethodSource("argumentsOfGarryUsernameAndEmail")
+    public void test_Invalid_UpdateUserPasswordByUsername_WrongPassword(String usernameOrEmail) throws Exception {
+        String password = "3333";
+
+        mvc.perform(put(BASE_URL + "/password/username-email/{username-or-email}", usernameOrEmail)
+                        .header("Authorization", "Bearer " + tokenUser)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(
+                                asJsonString(
+                                        new UserUpdatePasswordRequest(password, "newpass")
+                                )
+                        )
+                )
+                .andExpect(status().isUnauthorized())
+                .andExpect(result ->
+                        assertThat(result.getResponse().getContentAsString()).isNotNull().isNotEmpty().contains("Wrong old password")
+                );
+
+        assertFalse(passwordEncoder.matches(password, userService.getUserByUsernameOrEmail(usernameOrEmail).getPassword()));
     }
 
     @Test
