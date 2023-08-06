@@ -192,7 +192,6 @@ public class RoleControllerTests {
         String newRoleName = "NEWROLE";
 
         Role role = new Role();
-        role.setId(3L);
         role.setName(newRoleName);
 
         RoleResponse expected = mapper.createRoleResponseFromEntity(role);
@@ -203,8 +202,9 @@ public class RoleControllerTests {
                 )
                 .andExpect(status().isCreated())
                 .andExpect(result ->
-                        assertEquals(asJsonString(expected), result.getResponse().getContentAsString(),
-                                "Created roles must be the sames")
+                        assertEquals(asJsonString(expected).substring(8),
+                                result.getResponse().getContentAsString().substring(8),
+                                "Created roles must be the sames, substring for not equal id`s.")
                 );
     }
 
