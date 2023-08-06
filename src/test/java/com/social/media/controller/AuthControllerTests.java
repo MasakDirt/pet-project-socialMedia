@@ -7,8 +7,6 @@ import com.social.media.model.dto.user.UserResponse;
 import com.social.media.model.entity.User;
 import com.social.media.model.mapper.UserMapper;
 import com.social.media.service.RoleService;
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -22,7 +20,7 @@ import static com.social.media.controller.StaticHelperForMVC.asJsonString;
 import static com.social.media.controller.StaticHelperForMVC.createUser;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
