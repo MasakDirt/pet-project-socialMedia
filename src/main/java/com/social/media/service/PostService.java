@@ -60,8 +60,8 @@ public class PostService {
         postRepository.delete(readById(id));
     }
 
-    public Set<Post> getAll() {
-        return new HashSet<>(postRepository.findAll());
+    public List<Post> getAll() {
+        return postRepository.findAll();
     }
 
     public List<Post> getUserPosts(long ownerId) {
