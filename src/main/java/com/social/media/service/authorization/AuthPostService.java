@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AuthPostService {
     private final PostService postService;
-    private AuthUserService authUserService;
+    private final AuthUserService authUserService;
 
     public boolean isAuthAndUserSameAndUserOwnerOfPostWithoutAdmin(long ownerId, long postId, String currentUsername) {
         return authUserService.getUser(currentUsername).getId() == ownerId && isUserOwnerOfPostWithoutAdmin(ownerId, postId);
