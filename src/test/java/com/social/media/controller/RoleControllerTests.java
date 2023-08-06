@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class RoleControllerTests {
-    public static final String BASE_URL = "/api/roles";
+    private static final String BASE_URL = "/api/roles";
 
     private final MockMvc mvc;
     private final RoleService roleService;
