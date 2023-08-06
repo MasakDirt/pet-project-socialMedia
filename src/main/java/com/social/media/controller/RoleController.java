@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.social.media.controller.ControllerHelper.getRole;
+
 @Slf4j
 @RestController
 @AllArgsConstructor
@@ -38,7 +40,7 @@ public class RoleController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public RoleResponse getRole(@PathVariable long id, Authentication authentication) {
+    public RoleResponse getRoleById(@PathVariable long id, Authentication authentication) {
         var role = mapper.createRoleResponseFromEntity(roleService.readById(id));
         log.info("=== GET-ROLE-ID === admin - {}", authentication.getPrincipal());
 
@@ -57,10 +59,8 @@ public class RoleController {
     @GetMapping("/user/{user-id}")
     @PreAuthorize("@authUserService.isAuthAndUserSame(#id, authentication.principal)")
     public RoleResponse getMyRole(@PathVariable("user-id") long id, Authentication authentication) {
-        var userRole = userService.getUserByUsernameOrEmail(authentication.getName()).getRole();
-
         var responseRole = mapper.createRoleResponseFromEntity(userService.readById(id).getRole());
-        log.info("=== GET-USER-ROLE === {} - {}", userRole.getName().toLowerCase(), authentication.getPrincipal());
+        log.info("=== GET-USER-ROLE === {} - {}", getRole(authentication), authentication.getPrincipal());
 
         return responseRole;
     }
