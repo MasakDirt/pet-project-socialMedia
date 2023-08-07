@@ -25,9 +25,9 @@ public class MessengerService {
             throw SAME_USERS_EXCEPTION;
         }
 
-        var messengerForOwner = createNewMessengerId(ownerId, recipientId);
+        var messengerForOwner = createNewMessengerById(ownerId, recipientId);
 
-        var messengerForRecipient = createNewMessengerId(recipientId, ownerId);
+        var messengerForRecipient = createNewMessengerById(recipientId, ownerId);
 
         messengerRepository.save(messengerForRecipient);
         return messengerRepository.save(messengerForOwner);
@@ -78,7 +78,7 @@ public class MessengerService {
         return messengerRepository.findAllByOwnerId(ownerId);
     }
 
-    private Messenger createNewMessengerId(long ownerId, long recipientId) {
+    private Messenger createNewMessengerById(long ownerId, long recipientId) {
         var messenger = new Messenger();
         messenger.setOwner(userService.readById(ownerId));
         messenger.setRecipient(userService.readById(recipientId));
