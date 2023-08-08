@@ -307,7 +307,7 @@ public class UserControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(result ->
                         assertEquals(asJsonString(expected).substring(8),
-                                result.getResponse().getContentAsString().substring(8),
+                                result.getResponse().getContentAsString().substring(9),
                                 "This test must be equal, substring for not same id`s, because we create user in this url, so he has not 0 id.")
                 );
     }
@@ -351,7 +351,7 @@ public class UserControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(result ->
                         assertEquals(asJsonString(expected).substring(8),
-                                result.getResponse().getContentAsString().substring(8),
+                                result.getResponse().getContentAsString().substring(9),
                                 "This test must be equal, substring for not same id`s, because we create user in this url, so he has not 0 id.")
                 );
     }
