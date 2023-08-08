@@ -24,9 +24,10 @@ public class LikeController {
     private final LikeService likeService;
     private final LikeMapper mapper;
 
-    @GetMapping("/posts/{post-id}/likes")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public List<LikeResponseForPosts> getAllLikesUnderPost(@PathVariable("post-id") long postId, Authentication authentication) {
+    @GetMapping("/users/{owner-id}/posts/{post-id}/likes")
+    @PreAuthorize("@authPostService.isUserOwnerOfPostWithoutAdmin(#ownerId, #postId)")
+    public List<LikeResponseForPosts> getAllLikesUnderPost(@PathVariable("owner-id") long ownerId, @PathVariable("post-id") long postId,
+                                                           Authentication authentication) {
         var responses = likeService.
                 getAllLikesUnderPost(postId)
                 .stream()
@@ -37,7 +38,7 @@ public class LikeController {
         return responses;
     }
 
-    @GetMapping("users/{owner-id}/likes")
+    @GetMapping("/users/{owner-id}/likes")
     @PreAuthorize("@authUserService.isAuthAndUserSame(#ownerId, authentication.principal)")
     public List<LikeResponseForOwner> getAllUserLikes(@PathVariable("owner-id") long ownerId, Authentication authentication) {
         var responses = likeService
@@ -50,7 +51,7 @@ public class LikeController {
         return responses;
     }
 
-    @PostMapping("users/{owner-id}/posts/{post-id}/likes")
+    @PostMapping("/users/{owner-id}/posts/{post-id}/likes")
     @PreAuthorize("@authPostService.isUserOwnerOfPostWithoutAdmin(#ownerId, #postId)")
     public ResponseEntity<String> setLike(@PathVariable("owner-id") long ownerId, @PathVariable("post-id") long postId, Authentication authentication) {
         var created = likeService.create(authentication.getName(), postId);
@@ -62,16 +63,16 @@ public class LikeController {
                 );
     }
 
-    @DeleteMapping("users/{owner-id}/posts/{post-id}/likes/{id}")
+    @DeleteMapping("/users/{owner-id}/posts/{post-id}/likes/{id}")
     @PreAuthorize("@authLikeService.isUsersSameAndOwnerOfPostAndPostContainLikeWithoutAdmin(#ownerId, #postId, #id, authentication.principal)")
     public ResponseEntity<String> removeLike(@PathVariable("owner-id") long ownerId, @PathVariable("post-id") long postId,
                                              @PathVariable long id, Authentication authentication) {
-        var post = likeService.readById(id);
+        var like = likeService.readById(id);
         likeService.delete(id);
         log.info("=== DELETE-USER-ID-POSTS-ID-LIKE === {} - {}", getRole(authentication), authentication.getPrincipal());
 
         return ResponseEntity.ok(
-                String.format("User %s like successfully removed for %s post.", post.getOwner().getName(), post.getPost().getOwner().getName())
+                String.format("User %s like successfully removed for %s post.", like.getOwner().getName(), like.getPost().getOwner().getName())
         );
     }
 }
