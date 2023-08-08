@@ -1,6 +1,6 @@
 package com.social.media.controller;
 
-import com.social.media.model.dto.MessageResponse;
+import com.social.media.model.dto.message.MessageResponse;
 import com.social.media.model.dto.auth.LoginRequestWithEmail;
 import com.social.media.model.dto.auth.LoginRequestWithUsername;
 import com.social.media.model.entity.Message;
@@ -362,15 +362,15 @@ public class MessageControllerTests {
         long ownerId = 1L;
         long messengerId = 2L;
 
-        List<MessageResponse> beforeDeleting = messageService.getAllByMessenger(messengerId)
+        List<Message> beforeDeleting = messageService.getAllByMessenger(messengerId)
                 .stream()
-                .map(mapper::createMessageResponseFromMessage)
                 .toList();
 
-        MessageResponse deleted = beforeDeleting
+        Message deleted = beforeDeleting
                 .stream()
+                .filter(message -> message.getMessengerId() == messengerId)
                 .findAny()
-                .orElse(new MessageResponse());
+                .orElse(new Message());
 
         String messageId = deleted.getId();
 

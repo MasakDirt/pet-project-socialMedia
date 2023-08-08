@@ -46,7 +46,7 @@ public class MessageRepositoryTests {
                 () -> assertTrue(messages.size() < messageRepository.findAll().size(),
                         "Messages size must be smaller than all messages in db!"),
                 () -> assertTrue(messages.stream()
-                        .allMatch(message -> message.getMessengerId() == messengerId),
+                                .allMatch(message -> message.getMessengerId() == messengerId),
                         "All messages that read by messengerId must contains a valid messenger id.")
         );
     }
