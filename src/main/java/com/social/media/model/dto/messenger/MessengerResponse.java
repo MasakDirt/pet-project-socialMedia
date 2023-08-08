@@ -1,7 +1,7 @@
 package com.social.media.model.dto.messenger;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.social.media.model.dto.MessageResponse;
+import com.social.media.model.dto.message.MessageResponse;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;

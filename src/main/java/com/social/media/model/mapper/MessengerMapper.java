@@ -1,6 +1,6 @@
 package com.social.media.model.mapper;
 
-import com.social.media.model.dto.MessageResponse;
+import com.social.media.model.dto.message.MessageResponse;
 import com.social.media.model.dto.messenger.AllMessengersResponse;
 import com.social.media.model.dto.messenger.MessengerResponse;
 import com.social.media.model.entity.Message;
