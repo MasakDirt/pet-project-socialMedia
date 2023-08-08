@@ -46,7 +46,7 @@ public class AuthMessageServiceTests {
                 .getId();
 
         assertTrue(authMessageService.isAuthAndUserSameAndUserOwnerOfMessengerAndMessengerContainsMessageWithoutAdmin(
-                ownerId, currentUsername, messengerID, messageId),
+                        ownerId, currentUsername, messengerID, messageId),
                 "Here must be true, because auth user and user are sames, and user owner of messenger and messenger contain message!");
     }
 
@@ -63,7 +63,7 @@ public class AuthMessageServiceTests {
                 .getId();
 
         assertFalse(authMessageService.isAuthAndUserSameAndUserOwnerOfMessengerAndMessengerContainsMessageWithoutAdmin(
-                ownerId, currentUsername, messengerID, messageId),
+                        ownerId, currentUsername, messengerID, messageId),
                 "Here must be false, because messenger not contain message!");
     }
 }

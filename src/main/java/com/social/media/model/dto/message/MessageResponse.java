@@ -1,4 +1,4 @@
-package com.social.media.model.dto;
+package com.social.media.model.dto.message;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;

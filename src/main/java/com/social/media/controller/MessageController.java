@@ -1,6 +1,6 @@
 package com.social.media.controller;
 
-import com.social.media.model.dto.MessageResponse;
+import com.social.media.model.dto.message.MessageResponse;
 import com.social.media.model.mapper.MessageMapper;
 import com.social.media.service.MessageService;
 import jakarta.validation.Valid;
