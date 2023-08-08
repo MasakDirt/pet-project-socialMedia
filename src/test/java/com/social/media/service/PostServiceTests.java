@@ -24,7 +24,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -37,7 +36,7 @@ public class PostServiceTests {
     private final PostService postService;
     private final UserService userService;
 
-    private Set<Post> posts;
+    private List<Post> posts;
 
     @Autowired
     public PostServiceTests(PostService postService, UserService userService) {

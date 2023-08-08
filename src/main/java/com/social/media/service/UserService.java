@@ -11,9 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -116,8 +114,8 @@ public class UserService {
                 new EntityNotFoundException("User with email " + email + " not found!"));
     }
 
-    public Set<User> getAll() {
-        return new HashSet<>(userRepository.findAll());
+    public List<User> getAll() {
+        return userRepository.findAll();
     }
 
     public List<User> getAllByFirstName(String firstName) {

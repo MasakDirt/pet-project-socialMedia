@@ -16,8 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.social.media.controller.ControllerHelper.getRole;
 
@@ -31,12 +29,12 @@ public class PostController {
 
     @GetMapping("/posts")
     @PreAuthorize("hasRole('ADMIN')")
-    public Set<PostResponse> getAllPosts(Authentication authentication) {
+    public List<PostResponse> getAllPosts(Authentication authentication) {
         var responses = postService
                 .getAll()
                 .stream()
                 .map(mapper::createPostResponseFromPost)
-                .collect(Collectors.toSet());
+                .toList();
         log.info("=== GET-POSTS === {} - {}", getRole(authentication), authentication.getPrincipal());
 
         return responses;

@@ -25,9 +25,10 @@ public class CommentController {
     private final CommentService commentService;
     private final CommentMapper mapper;
 
-    @GetMapping("/posts/{post-id}/comments")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    public List<CommentResponseForPost> getAllCommentsUnderPost(@PathVariable("post-id") long postId, Authentication authentication) {
+    @GetMapping("/users/{owner-id}/posts/{post-id}/comments")
+    @PreAuthorize("@authPostService.isUserOwnerOfPostWithoutAdmin(#ownerId, #postId)")
+    public List<CommentResponseForPost> getAllCommentsUnderPost(@PathVariable("owner-id") long ownerId,
+                                                                @PathVariable("post-id") long postId, Authentication authentication) {
         var responses = commentService
                 .getAllByPostId(postId)
                 .stream()

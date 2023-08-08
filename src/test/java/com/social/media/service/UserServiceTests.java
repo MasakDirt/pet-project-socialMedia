@@ -17,7 +17,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.*;
@@ -32,7 +31,7 @@ public class UserServiceTests {
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
 
-    private Set<User> users;
+    private List<User> users;
 
     @Autowired
     public UserServiceTests(UserService userService, PasswordEncoder passwordEncoder, RoleService roleService) {
